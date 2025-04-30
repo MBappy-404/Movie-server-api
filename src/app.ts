@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Movie server is running");
+  res.send("Movie server is running!!");
 });
 
  
