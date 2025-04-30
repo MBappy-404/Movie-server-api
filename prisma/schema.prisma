@@ -56,6 +56,16 @@ model Content {
   @@map("contents")
 }
 
+model Platform {
+  id           String   @id @default(uuid())
+  platformName String
+  platformLogo String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("platforms")
+}
+
 enum UserRole {
   ADMIN
   USER
