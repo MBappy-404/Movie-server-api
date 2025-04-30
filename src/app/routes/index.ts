@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { UserRoutes } from "../modules/User/user.route";
 import { GenreRoutes } from "../modules/Genre/genre.routes";
- 
+import { PlatformRoutes } from "../modules/Platform/platform.routes";
 
 const router = Router();
 
@@ -14,6 +14,10 @@ const moduleRoutes = [
   {
     path: "/genre",
     routes: GenreRoutes,
+  },
+  {
+    path: "/platform",
+    routes: PlatformRoutes,
   },
 ];
 
