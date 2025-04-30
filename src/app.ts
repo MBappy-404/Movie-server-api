@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response }  from "express";
 import cors from "cors";
 import  HttpStatus  from "http-status";
-import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import router from "./app/routes";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
 
 // middlewares 
 const app = express();
