@@ -26,6 +26,32 @@ model Genre {
   genreName String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("genres")
+}
+
+model Content {
+  id String @id @default(uuid())
+
+  title          String
+  releaseYear    String
+  duration       String
+  thumbnail      String
+  price          Float
+  director       String
+  producer       String
+  actor          String
+  actress        String
+  spoilerWarning String
+  synopsis       String
+  isAvailable    Boolean @default(false)
+  genreId        String
+  platformId     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contents")
 }
 
 enum UserRole {
