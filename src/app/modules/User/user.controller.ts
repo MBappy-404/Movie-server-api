@@ -4,7 +4,6 @@ import { UserServices } from "./user.service";
 import pick from "../../utils/pick";
 import { userFilterableFields } from "./user.constant";
 import sendResponse from "../../helper/sendResponse";
-import { IAuth } from "./user.interface";
 
 const RegisterUser = catchAsync(async(req, res)=> {
     const result = await UserServices.UserRegisterIntoDB(req.body)
@@ -56,7 +55,7 @@ const UpdateUser = catchAsync(async(req, res)=> {
     const result = await UserServices.updateUserIntoDB(id, req.body);
     sendResponse(res, {
         success: true,
-        message: "User update successfully",
+        message: "User update successfully!!",
         statusCode: httpStatus.OK,
         data: result
     })
