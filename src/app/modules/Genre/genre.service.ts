@@ -21,11 +21,21 @@ const deleteGenreFromDB = async (id: string) => {
     },
   });
 
-  await prisma.genre.delete({
-    where: {
-      id,
-    },
+  const result = await prisma.$transaction(async (tx) => {
+    const contentsInfo = await tx.content.deleteMany({
+      where: {
+        genreId: id,
+      },
+    });
+
+    await tx.genre.delete({
+      where: {
+        id,
+      },
+    });
   });
+
+  return result;
 };
 
 export const GenreServices = {
