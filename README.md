@@ -18,7 +18,7 @@ Initial setup, basic routing, and video streaming functionality are being implem
 - [ ] Movie metadata (title, description, poster)
 - [ ] Search and filtering
 - [ ] Admin panel for uploads and management
-- [ ] Responsive frontend UI (React/Vue/etc.)
+- [ ] Responsive frontend UI (React/Next.js)
 
 ---
 
