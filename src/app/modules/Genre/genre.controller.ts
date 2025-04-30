@@ -1,5 +1,5 @@
 import { catchAsync } from "../../helper/catchAsync";
-import { sendResponse } from "../../helper/sendResponse";
+import sendResponse from "../../helper/sendResponse";
 import { GenreServices } from "./genre.service";
 import httpstatus from "http-status";
 
@@ -34,6 +34,7 @@ const deleteGenre = catchAsync(async (req, res) => {
     statusCode: httpstatus.OK,
     success: true,
     message: "This genre is deleted Successfully!",
+    data: result,
   });
 });
 

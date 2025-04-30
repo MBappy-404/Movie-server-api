@@ -1,5 +1,5 @@
 import { Router } from "express";
- 
+
 import { UserRoutes } from "../modules/User/user.route";
 import { GenreRoutes } from "../modules/Genre/genre.routes";
  
