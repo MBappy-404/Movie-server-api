@@ -22,10 +22,11 @@ model User {
 }
 
 model Genre {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   genreName String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
 
   @@map("genres")
 }
@@ -45,8 +46,9 @@ model Content {
   spoilerWarning String
   synopsis       String
   isAvailable    Boolean @default(false)
+  platformId     String?
   genreId        String
-  platformId     String
+  genre          Genre   @relation(fields: [genreId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
