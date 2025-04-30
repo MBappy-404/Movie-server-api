@@ -2,10 +2,6 @@ import express, { NextFunction, Request, Response }  from "express";
 import cors from "cors";
 import  HttpStatus  from "http-status";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
- 
- 
- 
-
 
 // middlewares 
 const app = express();
@@ -13,18 +9,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-
- 
-
-
-
 app.get("/", (req, res) => {
   res.send("Movie server is running");
 });
 
-// app.use("/api", appRouter);
-
+ 
+// global error handler 
 app.use(globalErrorHandler);
+
+// not found route handler
 app.use((req: Request, res: Response, next: NextFunction)=>{
 
   res.status(HttpStatus.NOT_FOUND).json({
@@ -37,4 +30,4 @@ app.use((req: Request, res: Response, next: NextFunction)=>{
   })
 })
 
-export default app; // Export the app instance for use in server.ts
+export default app;  
