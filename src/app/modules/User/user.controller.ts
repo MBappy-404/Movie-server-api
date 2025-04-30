@@ -6,6 +6,7 @@ import { userFilterableFields } from "./user.constant";
 import sendResponse from "../../helper/sendResponse";
 import { IAuth } from "./user.interface";
 
+ 
 const RegisterUser = catchAsync(async(req, res)=> {
     const result = await UserServices.UserRegisterIntoDB(req.body)
     sendResponse(res, {
@@ -15,6 +16,7 @@ const RegisterUser = catchAsync(async(req, res)=> {
         data: result
     })
 })
+ 
 
 const getAllUserData = catchAsync(async(req, res)=> {
     const filters = pick(req.query, userFilterableFields);
@@ -64,9 +66,13 @@ const UpdateUser = catchAsync(async(req, res)=> {
 
 
 export const UserController = {
+ 
     RegisterUser,
     getAllUserData,
     getUserById,
     DeleteUser,
     UpdateUser
+ 
+
 }
+ 
