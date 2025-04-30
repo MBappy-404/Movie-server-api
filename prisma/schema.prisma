@@ -46,9 +46,12 @@ model Content {
   spoilerWarning String
   synopsis       String
   isAvailable    Boolean @default(false)
-  platformId     String?
-  genreId        String
-  genre          Genre   @relation(fields: [genreId], references: [id])
+
+  platformId String?
+  platform   Platform? @relation(fields: [platformId], references: [id])
+
+  genreId String
+  genre   Genre  @relation(fields: [genreId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,11 +60,12 @@ model Content {
 }
 
 model Platform {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   platformName String
   platformLogo String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  content      Content[]
 
   @@map("platforms")
 }
