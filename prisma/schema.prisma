@@ -45,16 +45,13 @@ model Content {
   actress        String
   spoilerWarning String
   synopsis       String
-  isAvailable    Boolean @default(false)
-
-  platformId String?
-  platform   Platform? @relation(fields: [platformId], references: [id])
-
-  genreId String
-  genre   Genre  @relation(fields: [genreId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isAvailable    Boolean  @default(false)
+  platformId     String
+  platform       Platform @relation(fields: [platformId], references: [id])
+  genreId        String
+  genre          Genre    @relation(fields: [genreId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("contents")
 }

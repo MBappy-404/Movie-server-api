@@ -42,6 +42,7 @@ const deleteGenre = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         statusCode: http_status_1.default.OK,
         success: true,
         message: "This genre is deleted Successfully!",
+        data: result,
     });
 }));
 exports.GenreController = {
