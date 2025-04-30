@@ -8,17 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
-const PORT = process.env.PORT || 5000;
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        app_1.default.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+const catchAsync_1 = require("../helper/catchAsync");
+const validateRequest = (schema) => {
+    return (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        yield schema.parseAsync({
+            body: req.body,
+            cookies: req.cookies,
         });
-    });
-}
-main();
+        next();
+    }));
+};
+exports.default = validateRequest;

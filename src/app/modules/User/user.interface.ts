@@ -4,3 +4,8 @@ export type IUser = {
     contactNumber: string
     password: string
 }
+
+export interface IAuth {
+    email: string
+    role: string
+}

@@ -7,16 +7,19 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const http_status_1 = __importDefault(require("http-status"));
 const globalErrorHandler_1 = require("./app/middleware/globalErrorHandler");
+const routes_1 = __importDefault(require("./app/routes"));
 // middlewares 
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)());
+app.use('/api', routes_1.default);
 app.get("/", (req, res) => {
-    res.send("Movie server is running");
+    res.send("Movie server is running!!");
 });
-// app.use("/api", appRouter);
+// global error handler 
 app.use(globalErrorHandler_1.globalErrorHandler);
+// not found route handler
 app.use((req, res, next) => {
     res.status(http_status_1.default.NOT_FOUND).json({
         success: false,
@@ -27,4 +30,4 @@ app.use((req, res, next) => {
         }
     });
 });
-exports.default = app; // Export the app instance for use in server.ts
+exports.default = app;
