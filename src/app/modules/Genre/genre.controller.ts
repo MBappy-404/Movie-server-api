@@ -1,5 +1,5 @@
 import { catchAsync } from "../../helper/catchAsync";
-import { sendResponse } from "../../helper/sendResponse";
+import sendResponse from "../../helper/sendResponse";
 import { GenreServices } from "./genre.service";
 import httpstatus from "http-status";
 
