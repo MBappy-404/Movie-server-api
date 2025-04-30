@@ -5,8 +5,8 @@ import { AdminService } from "./admin.service";
 
 
 const AdminBlockUser = catchAsync(async(req, res)=> {
-    const {id}: any = req.params.userId;
-    await AdminService.UserBlockIntoDB(id)
+    const {userId}: any = req.params;
+    await AdminService.UserBlockIntoDB(userId)
     sendResponse(res, {
         success: true,
         message: 'User blocked successfully',

@@ -5,21 +5,26 @@ import httpStatus from "http-status";
 
 
 const UserBlockIntoDB = async (id: string) => {
-    const userData = await prisma.user.findFirst({
+   await prisma.user.findFirstOrThrow({
         where: {id}
     })
-    if (!userData) {
-        throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    if (userData.status === UserStatus.BLOCKED ) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User already blocked")
-    }
+    
+    const result = await prisma.$transaction(async(transactionClient)=> {
 
-    const result = await prisma.user.update({
-        where: {id: userData.id},
-        data: {
-            status: UserStatus.BLOCKED
-        } 
+        const verifydata = await transactionClient.user.findFirst({
+            where: {id}
+        })
+        if(verifydata?.status === "BLOCKED") {
+            throw new AppError(httpStatus.BAD_REQUEST, "User already blocked")
+        }
+
+        await transactionClient.user.update({
+            where: {id},
+            data: {
+                status: UserStatus.BLOCKED
+            }
+        })
+        
     })
 
     return result
