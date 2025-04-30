@@ -2,8 +2,6 @@ import express, { NextFunction, Request, Response }  from "express";
 import cors from "cors";
 import  HttpStatus  from "http-status";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
- 
- 
 
 // middlewares 
 const app = express();
@@ -16,8 +14,10 @@ app.get("/", (req, res) => {
 });
 
  
-
+// global error handler 
 app.use(globalErrorHandler);
+
+// not found route handler
 app.use((req: Request, res: Response, next: NextFunction)=>{
 
   res.status(HttpStatus.NOT_FOUND).json({
