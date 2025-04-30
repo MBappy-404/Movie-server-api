@@ -64,7 +64,7 @@ const UpdateUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
     const result = yield user_service_1.UserServices.updateUserIntoDB(id, req.body);
     (0, sendResponse_1.default)(res, {
         success: true,
-        message: "User update successfully",
+        message: "User update successfully!!",
         statusCode: http_status_1.default.OK,
         data: result
     });

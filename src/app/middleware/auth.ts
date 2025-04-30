@@ -5,6 +5,7 @@ import verifyToken from "../utils/verifyToken"
 import config from "../config"
 import { JwtPayload, Secret } from "jsonwebtoken"
 import { UserRole } from "@prisma/client"
+import prisma from "../helper/prisma"
 
 
 

@@ -22,10 +22,38 @@ model User {
 }
 
 model Genre {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   genreName String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
+
+  @@map("genres")
+}
+
+model Content {
+  id String @id @default(uuid())
+
+  title          String
+  releaseYear    String
+  duration       String
+  thumbnail      String
+  price          Float
+  director       String
+  producer       String
+  actor          String
+  actress        String
+  spoilerWarning String
+  synopsis       String
+  isAvailable    Boolean @default(false)
+  platformId     String?
+  genreId        String
+  genre          Genre   @relation(fields: [genreId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("contents")
 }
 
 model Platform {
