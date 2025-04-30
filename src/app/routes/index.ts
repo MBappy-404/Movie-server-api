@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import { UserRoutes } from "../modules/User/user.route";
 import { GenreRoutes } from "../modules/Genre/genre.routes";
+import { AuthRoutes } from "../modules/Auth/auth.route";
+import { AdminRoutes } from "../modules/Admin/admin.route";
  
 
 const router = Router();
@@ -15,6 +17,14 @@ const moduleRoutes = [
     path: "/genre",
     routes: GenreRoutes,
   },
+  {
+    path: "/auth",
+    routes: AuthRoutes,
+  },
+  {
+    path: "/admin",
+    routes: AdminRoutes,
+  }
 ];
 
 moduleRoutes.forEach(({ path, routes }) => {
