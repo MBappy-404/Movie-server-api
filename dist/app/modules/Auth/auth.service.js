@@ -61,6 +61,9 @@ const loginUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function*
             status: client_1.UserStatus.ACTIVE
         }
     });
+    if ((userData === null || userData === void 0 ? void 0 : userData.status) === "BLOCKED") {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already is blocked");
+    }
     const incorrectPassword = yield bcrypt.compare(payload.password, userData === null || userData === void 0 ? void 0 : userData.password);
     if (!incorrectPassword) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Password is incorrect");

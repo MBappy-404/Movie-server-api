@@ -30,11 +30,19 @@ const deleteGenreFromDB = (id) => __awaiter(void 0, void 0, void 0, function* ()
             id,
         },
     });
-    yield prisma_1.default.genre.delete({
-        where: {
-            id,
-        },
-    });
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const contentsInfo = yield tx.content.deleteMany({
+            where: {
+                genreId: id,
+            },
+        });
+        yield tx.genre.delete({
+            where: {
+                id,
+            },
+        });
+    }));
+    return result;
 });
 exports.GenreServices = {
     createGenreIntoDB,

@@ -14,4 +14,5 @@ const router = express_1.default.Router();
 router.post('/login', auth_controller_1.AuthController.LoginUser);
 router.post('/refreshtoken', (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), auth_controller_1.AuthController.refreshToken);
 router.post('/reset-password', (0, validateRequest_1.default)(auth_validation_1.authValidation.resetPasswordSchema), auth_controller_1.AuthController.resetPassword);
+router.post('/logout', auth_controller_1.AuthController.logout);
 exports.AuthRoutes = router;
