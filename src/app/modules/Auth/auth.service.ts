@@ -17,8 +17,12 @@ const loginUserIntoDB = async (payload: any) => {
             status: UserStatus.ACTIVE
         }
     })
-
-    const incorrectPassword = await bcrypt.compare(payload.password, userData?.password)
+    
+    if(userData?.status === "BLOCKED"){
+        throw new AppError(httpStatus.BAD_REQUEST, "User already is blocked")
+    }
+    
+    const incorrectPassword = await bcrypt.compare(payload.password, userData?.password as string)
     if (!incorrectPassword) {
         throw new AppError(httpStatus.BAD_REQUEST, "Password is incorrect")
     }
