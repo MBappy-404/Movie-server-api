@@ -2,11 +2,23 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../helper/prisma";
 import { IPaginationOptions } from "../../interface/pagination.type";
 import { paginationHelper } from "../../helper/paginationHelper";
-import { contentSearchAbleFields } from "./content.constant";
 
 const createContentIntoDB = async (payload: any) => {
-  const result = await prisma.content.create({
-    data: payload,
+  const result = await prisma.$transaction(async (tx) => {
+    const data = payload.content;
+
+    const content = await tx.content.create({
+      data: { ...data },
+    });
+
+    await tx.contentLinks.create({
+      data: {
+        contentId: content.id,
+        contentLink: payload.contentLink,
+      },
+    });
+
+    return content;
   });
 
   return result;

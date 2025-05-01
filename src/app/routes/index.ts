@@ -13,6 +13,7 @@ import { CommentRoutes } from "../modules/Comments/comment.route";
 import { LikeRoutes } from "../modules/Like/like.route";
 import { UserPurchaseContentsRoutes } from "../modules/UserPurchaseContents/userPurchaseContents.routes";
 import { PaymentRoutes } from "../modules/Payment/payment.routes";
+import { ContentLinksRoutes } from "../modules/ContentLinks/contentLinks.routes";
 
 const router = Router();
 
@@ -60,6 +61,10 @@ const moduleRoutes = [
   {
     path: "/payment",
     routes: PaymentRoutes,
+  },
+  {
+    path: "/content-links",
+    routes: ContentLinksRoutes,
   },
 ];
 
