@@ -22,6 +22,8 @@ model User {
 
   reviews Reviews[]
   comment Comment[]
+
+  like like[]
 }
 
 model Genre {
@@ -90,11 +92,13 @@ model Reviews {
   content    Content      @relation(fields: [contentId], references: [id])
   reviewText String
   rating     Int
+  spoiler    Boolean      @default(false)
   status     ReviewStatus @default(PENDING)
   tags       ReviewTags   @default(CLASSIC)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   comment    Comment[]
+  like       like[]
 
   @@map("reviews")
 }
@@ -121,4 +125,22 @@ model Comment {
   updatedAt DateTime @updatedAt
 
   @@map("comments")
+}
+
+model like {
+  id        String     @id @default(uuid())
+  reviewId  String
+  review    Reviews    @relation(fields: [reviewId], references: [id])
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  status    LikeStatus
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("likes")
+}
+
+enum LikeStatus {
+  LIKED
+  DISLIKED
 }
