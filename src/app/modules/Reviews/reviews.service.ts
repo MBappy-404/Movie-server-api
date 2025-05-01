@@ -1,4 +1,4 @@
-import { Reviews, User, UserStatus } from "@prisma/client";
+import { Reviews, ReviewStatus, User, UserStatus } from "@prisma/client";
 import prisma from "../../helper/prisma";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
@@ -41,6 +41,14 @@ const getSingleReviews = async (id: string) => {
   return result;
 };
 const updateReview = async (id: string, payload: Reviews) => {
+
+  const checkReview = await prisma.reviews.findUnique({
+    where: {id, status: ReviewStatus.PUBLISHED}
+  })
+  if(checkReview){
+    throw new AppError(httpStatus.BAD_REQUEST, "Review already published")
+  }
+
   const result = await prisma.reviews.update({
     where: {
       id,

@@ -65,6 +65,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
       OR: [
         { title: { contains: searchTerm, mode: "insensitive" } },
         { synopsis: { contains: searchTerm, mode: "insensitive" } },
+        { releaseYear: { contains: searchTerm, mode: "insensitive" } },
         { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
         { platform: { platformName: { contains: searchTerm, mode: "insensitive" } } },
         { director: { contains: searchTerm, mode: "insensitive" } },
