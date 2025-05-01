@@ -40,9 +40,29 @@ const getSingleReviews = async (id: string) => {
   });
   return result;
 };
+const updateReview = async (id: string, payload: Reviews) => {
+  const result = await prisma.reviews.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
+const deleteReview = async (id: string) => {
+  const result = await prisma.reviews.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
 
 export const ReviewsService = {
   addReviews,
   getAllReviews,
-  getSingleReviews
+  getSingleReviews,
+  updateReview,
+  deleteReview,
 };

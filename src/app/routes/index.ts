@@ -9,6 +9,7 @@ import { AuthRoutes } from "../modules/Auth/auth.route";
 import { AdminRoutes } from "../modules/Admin/admin.route";
 import { ContentRoutes } from "../modules/Content/content.routes";
 import { ReviewsRoutes } from "../modules/Reviews/reviews.route";
+import { CommentRoutes } from "../modules/Comments/comment.route";
 
 const router = Router();
 
@@ -40,6 +41,10 @@ const moduleRoutes = [
   {
     path: "/reviews",
     routes: ReviewsRoutes,
+  },
+  {
+    path: "/comment",
+    routes: CommentRoutes,
   },
 ];
 
