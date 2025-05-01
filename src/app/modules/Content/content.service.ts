@@ -66,11 +66,10 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         { title: { contains: searchTerm, mode: "insensitive" } },
         { synopsis: { contains: searchTerm, mode: "insensitive" } },
         { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
-        {
-          platform: {
-            platformName: { contains: searchTerm, mode: "insensitive" },
-          },
-        },
+        { platform: { platformName: { contains: searchTerm, mode: "insensitive" } } },
+        { director: { contains: searchTerm, mode: "insensitive" } },
+        { actor: { contains: searchTerm, mode: "insensitive" } },
+        { actress: { contains: searchTerm, mode: "insensitive" } },
       ],
     });
   }
@@ -107,17 +106,80 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     });
   }
 
+  const whereConditions: Prisma.ContentWhereInput =
+    andCondition.length > 0 ? { AND: andCondition } : {};
+
   let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: "desc" }; // default
 
   if (options.sortBy) {
+    const sortOrder = options.sortOrder?.toLowerCase() === "asc" ? "asc" : "desc";
+
     switch (options.sortBy) {
       case "rating":
-        orderBy = { price: "desc" };
-        break;
+        // Sort by average rating from reviews
+        const contents = await prisma.content.findMany({
+          where: whereConditions,
+          include: {
+            reviews: {
+              select: {
+                rating: true,
+              }
+            },
+          },
+        });
+
+        const contentsWithAvgRating = contents.map(content => ({
+          ...content,
+          averageRating: content.reviews.length > 0
+            ? content.reviews.reduce((acc, review) => acc + review.rating, 0) / content.reviews.length
+            : 0
+        }));
+
+        contentsWithAvgRating.sort((a, b) => 
+          sortOrder === "asc" 
+            ? a.averageRating - b.averageRating 
+            : b.averageRating - a.averageRating
+        );
+
+        return {
+          meta: {
+            page,
+            limit,
+            total: contents.length,
+          },
+          data: contentsWithAvgRating.slice(skip, skip + limit),
+        };
 
       case "reviews":
-        orderBy = { createdAt: "desc" };
-        break;
+        // Sort by number of reviews
+        const contentsWithReviewCount = await prisma.content.findMany({
+          where: whereConditions,
+          include: {
+            _count: {
+              select: { reviews: true }
+            }
+          },
+          orderBy: {
+            reviews: {
+              _count: sortOrder
+            }
+          },
+          skip,
+          take: limit,
+        });
+
+        const total = await prisma.content.count({
+          where: whereConditions,
+        });
+
+        return {
+          meta: {
+            page,
+            limit,
+            total,
+          },
+          data: contentsWithReviewCount,
+        };
 
       case "latest":
         const endDate = new Date();
@@ -133,13 +195,22 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           },
         });
 
-        orderBy = { createdAt: "desc" };
+        orderBy = { createdAt: sortOrder };
+        break;
+
+      case "title":
+        orderBy = { title: sortOrder };
+        break;
+
+      case "price":
+        orderBy = { price: sortOrder };
+        break;
+
+      case "releaseYear":
+        orderBy = { releaseYear: sortOrder };
         break;
     }
   }
-
-  const whereConditions: Prisma.ContentWhereInput =
-    andCondition.length > 0 ? { AND: andCondition } : {};
 
   const result = await prisma.content.findMany({
     where: whereConditions,
