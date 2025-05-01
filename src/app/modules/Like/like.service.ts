@@ -1,10 +1,10 @@
-import { Comment, like, LikeStatus, Reviews, UserStatus } from "@prisma/client";
+import { Like, UserStatus } from "@prisma/client";
 
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import prisma from "../../helper/prisma";
 
-const addLike = async (payload: like) => {
+const addLike = async (payload: Like) => {
   const isUserExist = await prisma.user.findUnique({
     where: {
       id: payload.userId,
@@ -22,6 +22,21 @@ const addLike = async (payload: like) => {
     );
   }
 
+  const isLikeExist = await prisma.like.findFirst({
+    where:{
+      reviewId: payload.reviewId,
+      userId: payload.userId,
+      
+    }
+  }) 
+
+  if (isLikeExist) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `You have already ${isLikeExist.status.toLowerCase()} this review.`
+    );
+  }
+
   const result = await prisma.like.create({
     data: payload,
   });
@@ -29,19 +44,17 @@ const addLike = async (payload: like) => {
   return result;
 };
 
-const updateLike = async (id: string, payload: Comment) => {
-  const result = await prisma.comment.update({
+const updateLike = async (id: string, payload: Like) => {
+  const result = await prisma.like.update({
     where: {
       id,
     },
-    data: {
-      
-    }
+    data: payload,
   });
   return result;
 };
 
-export const CommentServices = {
+export const LikeServices = {
   addLike,
   updateLike,
 };

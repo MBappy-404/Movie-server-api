@@ -10,6 +10,7 @@ import { AdminRoutes } from "../modules/Admin/admin.route";
 import { ContentRoutes } from "../modules/Content/content.routes";
 import { ReviewsRoutes } from "../modules/Reviews/reviews.route";
 import { CommentRoutes } from "../modules/Comments/comment.route";
+import { LikeRoutes } from "../modules/Like/like.route";
 
 const router = Router();
 
@@ -43,9 +44,12 @@ const moduleRoutes = [
     routes: ReviewsRoutes,
   },
   {
+    path: "/like",
+    routes: LikeRoutes,
+  },{
     path: "/comment",
     routes: CommentRoutes,
-  },
+  }
 ];
 
 moduleRoutes.forEach(({ path, routes }) => {

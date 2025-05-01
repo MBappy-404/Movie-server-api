@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post(
   "/",
- auth(UserRole.USER, UserRole.ADMIN),
+//  auth(UserRole.USER, UserRole.ADMIN),
   CommentController.addComment
 );
 router.get("/", CommentController.getAllComments);
