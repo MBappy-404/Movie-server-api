@@ -23,7 +23,7 @@ model User {
   reviews Reviews[]
   comment Comment[]
 
-  like like[]
+  like Like[]
 }
 
 model Genre {
@@ -98,7 +98,7 @@ model Reviews {
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   comment    Comment[]
-  like       like[]
+  like       Like[]
 
   @@map("reviews")
 }
@@ -127,7 +127,7 @@ model Comment {
   @@map("comments")
 }
 
-model like {
+model Like {
   id        String     @id @default(uuid())
   reviewId  String
   review    Reviews    @relation(fields: [reviewId], references: [id])

@@ -1,22 +1,19 @@
 import express from "express";
-import { CommentController } from "./like.controller";
-import auth from "../../middleware/auth";
-import { UserRole } from "@prisma/client";
+
+import { LikeController } from "./like.controller";
 
 const router = express.Router();
 
 router.post(
   "/",
- auth(UserRole.USER, UserRole.ADMIN),
-  CommentController.addComment
+
+  LikeController.addLike
 );
-router.get("/", CommentController.getAllComments);
 
 router.patch(
   "/:id",
 
-  CommentController.updateComment
+  LikeController.updateLike
 );
-router.delete("/:id", CommentController.deleteComment);
 
-export const CommentRoutes = router;
+export const LikeRoutes = router;
