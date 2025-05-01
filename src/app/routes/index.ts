@@ -11,6 +11,8 @@ import { ContentRoutes } from "../modules/Content/content.routes";
 import { ReviewsRoutes } from "../modules/Reviews/reviews.route";
 import { CommentRoutes } from "../modules/Comments/comment.route";
 import { LikeRoutes } from "../modules/Like/like.route";
+import { UserPurchaseContentsRoutes } from "../modules/UserPurchaseContents/userPurchaseContents.routes";
+import { PaymentRoutes } from "../modules/Payment/payment.routes";
 
 const router = Router();
 
@@ -46,10 +48,19 @@ const moduleRoutes = [
   {
     path: "/like",
     routes: LikeRoutes,
-  },{
+  },
+  {
     path: "/comment",
     routes: CommentRoutes,
-  }
+  },
+  {
+    path: "/purchase-contents",
+    routes: UserPurchaseContentsRoutes,
+  },
+  {
+    path: "/payment",
+    routes: PaymentRoutes,
+  },
 ];
 
 moduleRoutes.forEach(({ path, routes }) => {
