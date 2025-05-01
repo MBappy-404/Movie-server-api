@@ -19,6 +19,9 @@ model User {
   profilePhoto  String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+
+  reviews Reviews[]
+  comment Comment[]
 }
 
 model Genre {
@@ -45,13 +48,14 @@ model Content {
   actress        String
   spoilerWarning String
   synopsis       String
-  isAvailable    Boolean  @default(false)
+  isAvailable    Boolean   @default(false)
   platformId     String
-  platform       Platform @relation(fields: [platformId], references: [id])
+  platform       Platform  @relation(fields: [platformId], references: [id])
   genreId        String
-  genre          Genre    @relation(fields: [genreId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  genre          Genre     @relation(fields: [genreId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  reviews        Reviews[]
 
   @@map("contents")
 }
@@ -76,4 +80,45 @@ enum UserStatus {
   ACTIVE
   BLOCKED
   DELETED
+}
+
+model Reviews {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  contentId  String
+  content    Content      @relation(fields: [contentId], references: [id])
+  reviewText String
+  rating     Int
+  status     ReviewStatus @default(PENDING)
+  tags       ReviewTags   @default(CLASSIC)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  comment    Comment[]
+
+  @@map("reviews")
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  PENDING
+  DELETED
+}
+
+enum ReviewTags {
+  CLASSIC
+  UNDERRATED
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  reviewId  String
+  review    Reviews  @relation(fields: [reviewId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
 }
