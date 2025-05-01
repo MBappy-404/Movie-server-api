@@ -43,9 +43,23 @@ const deleteComment = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleComment = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await CommentServices.getSingleComment(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Comments are retrieved successfully",
+    data: result,
+  });
+});
+
 export const CommentController = {
   addComment,
   getAllComments,
   updateComment,
   deleteComment,
+  getSingleComment,
 };

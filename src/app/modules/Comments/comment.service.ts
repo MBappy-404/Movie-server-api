@@ -53,9 +53,34 @@ const deleteComment = async (id: string) => {
   return result;
 };
 
+const getSingleComment = async (id: string) => {
+  const result = await prisma.comment.findMany({
+    where: {
+      reviewId: id,
+      parentId: null,
+    },
+    include: {
+      user: true,
+      replies: {
+        include: {
+          user: true,
+          replies: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const CommentServices = {
   addComment,
   getAllComments,
   updateComment,
   deleteComment,
+  getSingleComment,
 };
