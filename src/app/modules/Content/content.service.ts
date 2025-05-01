@@ -51,11 +51,15 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   if (searchTerm) {
     andCondition.push({
       OR: [
-        { title: { contains: searchTerm, mode: 'insensitive' } },
-        { synopsis: { contains: searchTerm, mode: 'insensitive' } },
-        { genre: { genreName: { contains: searchTerm, mode: 'insensitive' } } },
-        { platform: { platformName: { contains: searchTerm, mode: 'insensitive' } } }
-      ]
+        { title: { contains: searchTerm, mode: "insensitive" } },
+        { synopsis: { contains: searchTerm, mode: "insensitive" } },
+        { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
+        {
+          platform: {
+            platformName: { contains: searchTerm, mode: "insensitive" },
+          },
+        },
+      ],
     });
   }
 
@@ -64,9 +68,9 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
       genre: {
         genreName: {
           contains: genre,
-          mode: "insensitive"
-        }
-      }
+          mode: "insensitive",
+        },
+      },
     });
   }
 
@@ -75,35 +79,35 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
       platform: {
         platformName: {
           contains: platform,
-          mode: "insensitive"
-        }
-      }
+          mode: "insensitive",
+        },
+      },
     });
   }
 
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
-      AND: Object.keys(filterData).map(key => ({
+      AND: Object.keys(filterData).map((key) => ({
         [key]: {
-          equals: (filterData as any)[key]
-        }
-      }))
+          equals: (filterData as any)[key],
+        },
+      })),
     });
   }
 
-  let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: 'desc' }; // default
+  let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: "desc" }; // default
 
   if (options.sortBy) {
     switch (options.sortBy) {
-      case 'rating':
-        orderBy = { price: 'desc' };
+      case "rating":
+        orderBy = { price: "desc" };
         break;
 
-      case 'reviews':
-        orderBy = { createdAt: 'desc' };
+      case "reviews":
+        orderBy = { createdAt: "desc" };
         break;
 
-      case 'latest':
+      case "latest":
         const endDate = new Date();
         const startDate = new Date();
         startDate.setDate(endDate.getDate() - 7);
@@ -117,12 +121,13 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           },
         });
 
-        orderBy = { createdAt: 'desc' };
+        orderBy = { createdAt: "desc" };
         break;
     }
   }
 
-  const whereConditions: Prisma.ContentWhereInput = andCondition.length > 0 ? { AND: andCondition } : {};
+  const whereConditions: Prisma.ContentWhereInput =
+    andCondition.length > 0 ? { AND: andCondition } : {};
 
   const result = await prisma.content.findMany({
     where: whereConditions,
@@ -148,8 +153,6 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     data: result,
   };
 };
-
-
 
 // const searchAndFilterContent = async (query: {
 //   searchTerm?: string;
@@ -181,7 +184,6 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 //   const skip = (parsedPage - 1) * parsedLimit;
 
 //   console.log(typeof parsedPage, typeof parsedLimit);
-
 
 //   const where: any = {};
 
