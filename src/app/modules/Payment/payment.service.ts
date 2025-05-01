@@ -98,11 +98,21 @@ const validatePayment = async (payload: { tran_id?: string }) => {
       },
     });
 
+    const contentLinkData = await tx.contentLinks.findFirst({
+      where: {
+        contentId: updatedPaymentData.contentId,
+      },
+    });
+
+    if (!contentLinkData) {
+      throw new AppError(httpStatus.NOT_FOUND, "Content link not found!");
+    }
+
     const purchaseData = await tx.userPurchaseContents.create({
       data: {
         userId: updatedPaymentData.userId,
         contentId: updatedPaymentData.contentId,
-        movieLink: "www.google.com",
+        movieLink: contentLinkData?.contentLink,
         status: updatedPaymentData.purchaseStatus,
       },
     });

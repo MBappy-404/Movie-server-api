@@ -39,6 +39,17 @@ model Genre {
   @@map("genres")
 }
 
+model ContentLinks {
+  id           String     @id @default(uuid())
+  contentId    String
+  content      Content    @relation(fields: [contentId], references: [id])
+  contentLink    String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("contentLinks")
+}
+
 model Content {
   id String @id @default(uuid())
 
@@ -63,6 +74,7 @@ model Content {
   reviews        Reviews[]
   userPurchaseContents UserPurchaseContents[]
   payments Payment[]
+  contentLinks ContentLinks[]
 
   @@map("contents")
 }
