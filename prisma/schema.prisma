@@ -24,7 +24,7 @@ model User {
   comment Comment[]
 
   userPurchaseContents UserPurchaseContents[]
-  payments Payment[]
+  payments             Payment[]
 
   like Like[]
 }
@@ -40,12 +40,12 @@ model Genre {
 }
 
 model ContentLinks {
-  id           String     @id @default(uuid())
-  contentId    String
-  content      Content    @relation(fields: [contentId], references: [id])
-  contentLink    String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id          String   @id @default(uuid())
+  contentId   String
+  content     Content  @relation(fields: [contentId], references: [id])
+  contentLink String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("contentLinks")
 }
@@ -53,28 +53,28 @@ model ContentLinks {
 model Content {
   id String @id @default(uuid())
 
-  title          String
-  releaseYear    String
-  duration       String
-  thumbnail      String
-  price          Float
-  director       String
-  producer       String
-  actor          String
-  actress        String
-  spoilerWarning String
-  synopsis       String
-  isAvailable    Boolean   @default(false)
-  platformId     String
-  platform       Platform  @relation(fields: [platformId], references: [id])
-  genreId        String
-  genre          Genre     @relation(fields: [genreId], references: [id])
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  reviews        Reviews[]
+  title                String
+  releaseYear          String
+  duration             String
+  thumbnail            String
+  price                Float
+  director             String
+  producer             String
+  actor                String
+  actress              String
+  spoilerWarning       String
+  synopsis             String
+  isAvailable          Boolean                @default(false)
+  platformId           String
+  platform             Platform               @relation(fields: [platformId], references: [id])
+  genreId              String
+  genre                Genre                  @relation(fields: [genreId], references: [id])
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  reviews              Reviews[]
   userPurchaseContents UserPurchaseContents[]
-  payments Payment[]
-  contentLinks ContentLinks[]
+  payments             Payment[]
+  contentLinks         ContentLinks[]
 
   @@map("contents")
 }
@@ -108,7 +108,7 @@ model Reviews {
   contentId  String
   content    Content      @relation(fields: [contentId], references: [id])
   reviewText String
-  rating     Int
+  rating     Float
   spoiler    Boolean      @default(false)
   status     ReviewStatus @default(PENDING)
   tags       ReviewTags   @default(CLASSIC)
@@ -132,12 +132,17 @@ enum ReviewTags {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  reviewId  String
-  review    Reviews  @relation(fields: [reviewId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  comment   String
+  id       String  @id @default(uuid())
+  reviewId String
+  review   Reviews @relation(fields: [reviewId], references: [id])
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+  comment  String
+
+  parentId String? // For nested replies
+  parent   Comment?  @relation("CommentToReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentToReplies")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -168,20 +173,19 @@ enum purchaseStatus {
 }
 
 model UserPurchaseContents {
-  id            String     @id @default(uuid())
-  userId        String
-  user          User       @relation(fields: [userId], references: [id])
-  contentId     String
-  content       Content    @relation(fields: [contentId], references: [id])
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id])
 
-  movieLink      String
+  movieLink String
 
-  status        purchaseStatus
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  status    purchaseStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   @@unique([userId, contentId])
-
   @@map("userPurchaseContents")
 }
 
@@ -191,24 +195,22 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id                 String         @id @default(uuid())
-  userId             String
-  user               User           @relation(fields: [userId], references: [id])
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  contentId          String
-  content            Content        @relation(fields: [contentId], references: [id])
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id])
 
-  purchaseStatus     purchaseStatus
+  purchaseStatus purchaseStatus
 
-  amount             Float
-  transactionId      String         @unique
-  status             PaymentStatus  @default(UNPAID)
+  amount        Float
+  transactionId String        @unique
+  status        PaymentStatus @default(UNPAID)
 
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, contentId])
-
   @@map("payments")
 }
-
