@@ -48,6 +48,8 @@ const getSingleReviews = async (id: string) => {
   });
   return result;
 };
+
+
 const updateReview = async (id: string, payload: Reviews) => {
 
   const checkReview = await prisma.reviews.findUnique({
