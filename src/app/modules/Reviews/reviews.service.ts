@@ -29,7 +29,12 @@ const addReviews = async (payload: Reviews) => {
 };
 
 const getAllReviews = async () => {
-  const result = await prisma.reviews.findMany();
+  const result = await prisma.reviews.findMany({
+    include:{
+      comment:true,
+      like:true,
+    }
+  });
   return result;
 };
 const getSingleReviews = async (id: string) => {
@@ -37,6 +42,9 @@ const getSingleReviews = async (id: string) => {
     where: {
       id,
     },
+    include:{
+      comment:true,
+    }
   });
   return result;
 };
