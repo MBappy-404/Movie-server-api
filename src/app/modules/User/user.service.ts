@@ -7,13 +7,32 @@ import { userSearchAbleFields } from "./user.constant"
 import { IUser } from "./user.interface"
 import * as bcrypt from 'bcrypt'
 import AppError from "../../errors/AppError"
-const UserRegisterIntoDB = async(payload: IUser)=> {
-    
-    const hashedPassword: string = await bcrypt.hash(payload.password, 12) //  hash password
-    payload.password = hashedPassword 
+import { FileUploader } from "../../helper/fileUploader";
+const UserRegisterIntoDB = async (req: any) => {
 
-    const result = prisma.user.create({
-        data: payload
+    const file = req.file
+
+    if (file) {
+        const uploadData = await FileUploader.uploadToCloudinary(file)
+        req.body.profilePhoto = uploadData?.secure_url
+    }
+
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 12) //  hash password
+    req.body.password = hashedPassword
+
+    const result = await prisma.$transaction(async (tx) => {
+        const verifyUser = await tx.user.findFirst({
+            where: {
+                email: req.body.email
+            }
+        })
+        if (verifyUser) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User already Created")
+        }
+        const createUser = prisma.user.create({
+            data: req.body
+        })
+        return createUser
     })
     return result
 }
@@ -72,43 +91,57 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 
 }
 
-const getUserByIdIntoDB = async(id: string)=> {
+const getUserByIdIntoDB = async (id: string) => {
     const verify = await prisma.user.findUnique({
-        where: {id}
+        where: { id }
     })
-    if(!verify){
-       throw new AppError(
+    if (!verify) {
+        throw new AppError(
             httpStatus.BAD_REQUEST,
             'User Not found!',
-          );
+        );
     }
     const result = await prisma.user.findUnique({
-        where: {id}
+        where: { id }
     })
     return result
 }
 
-const deleteUserIntoDB = async(id: string)=> {
+const deleteUserIntoDB = async (id: string) => {
     await prisma.user.findUniqueOrThrow({
-        where: {id}
+        where: { id }
     })
 
     const result = await prisma.user.delete({
-        where: {id}
+        where: { id }
     })
     return result
 }
 
-const updateUserIntoDB = async(id: string, payload: IUser)=> {
-    const verifyUser = await prisma.user.findUniqueOrThrow({
-        where: {id, status: UserStatus.ACTIVE}
-    })
-    const update = await prisma.user.update({
-        where: {email: verifyUser.email},
-        data: payload
-    })
-    return update
+const updateUserIntoDB = async (req: any) => {
+    const { id } = req.params
 
+    const file = req.file
+
+
+    const result = await prisma.$transaction(async (tx) => {
+        const verifyUser = await tx.user.findUniqueOrThrow({
+            where: { id, status: UserStatus.ACTIVE }
+        })
+
+        if (file) {
+            const uploadData = await FileUploader.uploadToCloudinary(file)
+            req.body.profilePhoto = uploadData?.secure_url
+        }
+
+        const update = await prisma.user.update({
+            where: { id, email: verifyUser.email },
+            data: req.body
+        })
+
+        return update
+    })
+    return result
 }
 
 export const UserServices = {

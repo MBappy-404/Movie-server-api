@@ -21,5 +21,6 @@ router.patch(
   ReviewsController.updateReview
 );
 router.delete("/:id", ReviewsController.deleteReview);
+router.get('/stats', ReviewsController.getReviewStats);
 
 export const ReviewsRoutes = router;
