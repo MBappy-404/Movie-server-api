@@ -1,9 +1,20 @@
+import { platform } from "os";
 import prisma from "../../helper/prisma";
 import { TPlatform } from "./platform.interface";
+import { FileUploader } from "../../helper/fileUploader";
+import { IFile } from "../../interface/file.type";
 
-const createPlatfromIntoDB = async (platform: TPlatform) => {
+const createPlatfromIntoDB = async (req: any) => {
+
+  const file = req.file as IFile;
+
+  if (file) {
+    const uploadData = await FileUploader.uploadToCloudinary(file);
+    req.body.platformLogo = uploadData?.secure_url;
+  }
+
   const result = await prisma.platform.create({
-    data: platform,
+    data: req.body,
   });
 
   return result;
@@ -23,18 +34,27 @@ const getSinglePlatformFromDB = async (id: string) => {
   return result;
 };
 
-const updatePlatformIntoDB = async (id: string, platform: TPlatform) => {
+const updatePlatformIntoDB = async (req: any) => {
+  const { id } = req.params;
+
   await prisma.platform.findUniqueOrThrow({
     where: {
       id,
     },
   });
 
+  const file = req.file as IFile;
+
+  if (file) {
+    const uploadData = await FileUploader.uploadToCloudinary(file);
+    req.body.platformLogo = uploadData?.secure_url;
+  }
+
   const result = await prisma.platform.update({
     where: {
       id,
     },
-    data: platform,
+    data: req.body as TPlatform ,
   });
   return result;
 };

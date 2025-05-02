@@ -4,11 +4,11 @@ import httpstatus from "http-status";
 import { ContentServices } from "./content.service";
 import pick from "../../utils/pick";
 import { contentFilterableFields } from "./content.constant";
-import { UserServices } from "../User/user.service";
 
 const createContent = catchAsync(async (req, res) => {
-  const result = await ContentServices.createContentIntoDB(req.body);
 
+  const result = await ContentServices.createContentIntoDB(req);
+  
   sendResponse(res, {
     statusCode: httpstatus.CREATED,
     success: true,
@@ -57,9 +57,20 @@ const getAllContentData = catchAsync(async(req, res)=> {
   })
 })
 
+const updateContent = catchAsync(async(req, res)=> {
+  const result = await ContentServices.updateContentIntoDB(req);
+  sendResponse(res, {
+    statusCode: httpstatus.OK,
+    success: true,
+    message: "Content is updated Successfully!",
+    data: result,
+  });
+})
+
 export const ContentController = {
   createContent,
   getSingleContent,
   deleteSingleContent,
   getAllContentData,
+  updateContent,
 };

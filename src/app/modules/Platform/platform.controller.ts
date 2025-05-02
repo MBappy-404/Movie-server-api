@@ -4,7 +4,8 @@ import { platformService } from "./platform.service";
 import httpStatus from "http-status";
 
 const createPlaform = catchAsync(async (req, res) => {
-  const result = await platformService.createPlatfromIntoDB(req.body);
+  console.log(req.body);
+  const result = await platformService.createPlatfromIntoDB(req);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -36,9 +37,8 @@ const getSinglePlatform = catchAsync(async (req, res) => {
 });
 
 const updatePlatform = catchAsync(async (req, res) => {
-  const { id } = req.params;
 
-  const result = await platformService.updatePlatformIntoDB(id, req.body);
+  const result = await platformService.updatePlatformIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

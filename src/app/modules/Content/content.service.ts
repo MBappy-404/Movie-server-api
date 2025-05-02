@@ -2,10 +2,27 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../helper/prisma";
 import { IPaginationOptions } from "../../interface/pagination.type";
 import { paginationHelper } from "../../helper/paginationHelper";
+import { FileUploader } from "../../helper/fileUploader";
+import { IFile } from "../../interface/file.type";
+import AppError from "../../errors/AppError";
+import httpStatus from "http-status";
 
-const createContentIntoDB = async (payload: any) => {
+const createContentIntoDB = async (req: any) => {
+
+
+  const file = req.file
+  const datainfo = req.body
+
+
+  if (file) {
+    const uploadData = await FileUploader.uploadToCloudinary(file)
+    req.body.content.thumbnail = uploadData?.secure_url
+  }
+
+
+
   const result = await prisma.$transaction(async (tx) => {
-    const data = payload.content;
+    const data = datainfo.content;
 
     const content = await tx.content.create({
       data: { ...data },
@@ -14,15 +31,16 @@ const createContentIntoDB = async (payload: any) => {
     await tx.contentLinks.create({
       data: {
         contentId: content.id,
-        contentLink: payload.contentLink,
+        contentLink: datainfo.contentLink,
       },
     });
 
     return content;
   });
-
   return result;
 };
+
+
 
 const getSingleContentFromDB = async (id: string) => {
   await prisma.content.findUniqueOrThrow({
@@ -40,8 +58,9 @@ const getSingleContentFromDB = async (id: string) => {
       platform: true,
       reviews: {
         include: {
-          comment: true,
-          like: true,
+          _count: {
+            select: { like: true },
+          }
         },
       },
     },
@@ -149,9 +168,9 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           averageRating:
             content.reviews.length > 0
               ? content.reviews.reduce(
-                  (acc, review) => acc + review.rating,
-                  0
-                ) / content.reviews.length
+                (acc, review) => acc + review.rating,
+                0
+              ) / content.reviews.length
               : 0,
         }));
 
@@ -261,6 +280,57 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     },
     data: result,
   };
+};
+
+const updateContentIntoDB = async (req: any) => {
+  const { id } = req.params;
+  const file = req.file as IFile;
+
+  if (file) {
+    const uploadData = await FileUploader.uploadToCloudinary(file);
+    req.body.content.thumbnail = uploadData?.secure_url;
+  }
+
+  const verifycontent = await prisma.content.findUnique({
+    where: { id }
+  });
+  
+  if (!verifycontent) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Content is not found!!");
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    // Update content
+    const updatedContent = await tx.content.update({
+      where: { id },
+      data: req.body.content
+    });
+
+    // Update content link if provided
+    if (req.body.contentLink) {
+      const contentLink = await tx.contentLinks.findFirst({
+        where: { contentId: id }
+      });
+
+      if (contentLink) {
+        await tx.contentLinks.update({
+          where: { id: contentLink.id },
+          data: { contentLink: req.body.contentLink }
+        });
+      } else {
+        await tx.contentLinks.create({
+          data: {
+            contentId: id,
+            contentLink: req.body.contentLink
+          }
+        });
+      }
+    }
+
+    return updatedContent;
+  });
+
+  return result;
 };
 
 // const searchAndFilterContent = async (query: {
@@ -383,4 +453,5 @@ export const ContentServices = {
   getSingleContentFromDB,
   deleteSingleContentFromDB,
   getAllFromDB,
+  updateContentIntoDB
 };
