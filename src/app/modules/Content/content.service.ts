@@ -35,6 +35,16 @@ const getSingleContentFromDB = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      genre: true,
+      platform: true,
+      reviews: {
+        include: {
+          comment: true,
+          like: true,
+        },
+      },
+    },
   });
 
   return result;
@@ -67,7 +77,11 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         { synopsis: { contains: searchTerm, mode: "insensitive" } },
         { releaseYear: { contains: searchTerm, mode: "insensitive" } },
         { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
-        { platform: { platformName: { contains: searchTerm, mode: "insensitive" } } },
+        {
+          platform: {
+            platformName: { contains: searchTerm, mode: "insensitive" },
+          },
+        },
         { director: { contains: searchTerm, mode: "insensitive" } },
         { actor: { contains: searchTerm, mode: "insensitive" } },
         { actress: { contains: searchTerm, mode: "insensitive" } },
@@ -113,7 +127,8 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: "desc" }; // default
 
   if (options.sortBy) {
-    const sortOrder = options.sortOrder?.toLowerCase() === "asc" ? "asc" : "desc";
+    const sortOrder =
+      options.sortOrder?.toLowerCase() === "asc" ? "asc" : "desc";
 
     switch (options.sortBy) {
       case "rating":
@@ -124,21 +139,25 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
             reviews: {
               select: {
                 rating: true,
-              }
+              },
             },
           },
         });
 
-        const contentsWithAvgRating = contents.map(content => ({
+        const contentsWithAvgRating = contents.map((content) => ({
           ...content,
-          averageRating: content.reviews.length > 0
-            ? content.reviews.reduce((acc, review) => acc + review.rating, 0) / content.reviews.length
-            : 0
+          averageRating:
+            content.reviews.length > 0
+              ? content.reviews.reduce(
+                  (acc, review) => acc + review.rating,
+                  0
+                ) / content.reviews.length
+              : 0,
         }));
 
-        contentsWithAvgRating.sort((a, b) => 
-          sortOrder === "asc" 
-            ? a.averageRating - b.averageRating 
+        contentsWithAvgRating.sort((a, b) =>
+          sortOrder === "asc"
+            ? a.averageRating - b.averageRating
             : b.averageRating - a.averageRating
         );
 
@@ -157,13 +176,13 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           where: whereConditions,
           include: {
             _count: {
-              select: { reviews: true }
-            }
+              select: { reviews: true },
+            },
           },
           orderBy: {
             reviews: {
-              _count: sortOrder
-            }
+              _count: sortOrder,
+            },
           },
           skip,
           take: limit,
@@ -221,6 +240,12 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     include: {
       genre: true,
       platform: true,
+      reviews: {
+        include: {
+          comment: true,
+          like: true,
+        },
+      },
     },
   });
 
