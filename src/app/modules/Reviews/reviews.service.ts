@@ -77,10 +77,51 @@ const deleteReview = async (id: string) => {
   return result;
 };
 
+const getReviewStats = async () => {
+  const stats = await prisma.reviews.groupBy({
+    by: ['contentId'],
+    _avg: {
+      rating: true
+    },
+    _count: {
+      rating: true
+    },
+    orderBy: {
+      _avg: {
+        rating: 'desc'
+      }
+    }
+  });
+
+  console.log(stats);
+
+  // Get content details for each stat
+  const statsWithContent = await Promise.all(
+    stats.map(async (stat) => {
+      const content = await prisma.content.findUnique({
+        where: { id: stat.contentId },
+        select: {
+          title: true,
+        }
+      });
+      
+      return {
+        contentId: stat.contentId,
+        title: content?.title,
+        averageRating: stat._avg.rating,
+        totalReviews: stat._count.rating
+      };
+    })
+  );
+
+  return statsWithContent;
+};
+
 export const ReviewsService = {
   addReviews,
   getAllReviews,
   getSingleReviews,
   updateReview,
   deleteReview,
+  getReviewStats,
 };

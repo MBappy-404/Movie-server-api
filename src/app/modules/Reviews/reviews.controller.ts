@@ -2,6 +2,7 @@ import { catchAsync } from "../../helper/catchAsync";
 import sendResponse from "../../helper/sendResponse";
 import { ReviewsService } from "./reviews.service";
 import httpStatus from "http-status";
+import { Request, Response } from "express";
 
 const addReviews = catchAsync(async (req, res) => {
   const result = await ReviewsService.addReviews(req.body);
@@ -52,10 +53,21 @@ const deleteReview = catchAsync(async (req, res) => {
   });
 });
 
+const getReviewStats = catchAsync(async (req, res) => {
+  const result = await ReviewsService.getReviewStats();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Review statistics retrieved successfully",
+    data: result
+  });
+});
+
 export const ReviewsController = {
   addReviews,
   getAllReviews,
   getSingleReviews,
   updateReview,
   deleteReview,
+  getReviewStats,
 };

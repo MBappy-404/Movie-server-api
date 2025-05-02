@@ -7,7 +7,7 @@ import sendResponse from "../../helper/sendResponse";
 
  
 const RegisterUser = catchAsync(async(req, res)=> {
-    const result = await UserServices.UserRegisterIntoDB(req.body)
+    const result = await UserServices.UserRegisterIntoDB(req)
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -53,8 +53,7 @@ const DeleteUser = catchAsync(async(req, res)=> {
 })
 
 const UpdateUser = catchAsync(async(req, res)=> {
-    const {id} = req.params
-    const result = await UserServices.updateUserIntoDB(id, req.body);
+    const result = await UserServices.updateUserIntoDB(req);
     sendResponse(res, {
         success: true,
         message: "User update successfully!!",
