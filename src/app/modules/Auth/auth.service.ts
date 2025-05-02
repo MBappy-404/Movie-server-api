@@ -29,8 +29,10 @@ const loginUserIntoDB = async (payload: any) => {
 
     const jwtPayloadData = {
         id: userData.id,
+        name: userData.name,
         email: userData.email,
         role: userData.role,
+        profilePhoto: userData.profilePhoto,
         status: userData.status
     }
 
@@ -64,9 +66,12 @@ const refreshTokenIntoDB = async (token: string) => {
     }
 
     const jwtPayloadData = {
+
         id: userData.id,
+        name: userData.name,
         email: userData.email,
         role: userData.role,
+        profilePhoto: userData.profilePhoto,
         status: userData.status
     }
 
