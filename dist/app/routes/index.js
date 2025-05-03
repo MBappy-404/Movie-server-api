@@ -7,6 +7,12 @@ const platform_routes_1 = require("../modules/Platform/platform.routes");
 const auth_route_1 = require("../modules/Auth/auth.route");
 const admin_route_1 = require("../modules/Admin/admin.route");
 const content_routes_1 = require("../modules/Content/content.routes");
+const reviews_route_1 = require("../modules/Reviews/reviews.route");
+const comment_route_1 = require("../modules/Comments/comment.route");
+const like_route_1 = require("../modules/Like/like.route");
+const userPurchaseContents_routes_1 = require("../modules/UserPurchaseContents/userPurchaseContents.routes");
+const payment_routes_1 = require("../modules/Payment/payment.routes");
+const contentLinks_routes_1 = require("../modules/ContentLinks/contentLinks.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -32,6 +38,30 @@ const moduleRoutes = [
     {
         path: "/content",
         routes: content_routes_1.ContentRoutes,
+    },
+    {
+        path: "/reviews",
+        routes: reviews_route_1.ReviewsRoutes,
+    },
+    {
+        path: "/like",
+        routes: like_route_1.LikeRoutes,
+    },
+    {
+        path: "/comment",
+        routes: comment_route_1.CommentRoutes,
+    },
+    {
+        path: "/purchase-contents",
+        routes: userPurchaseContents_routes_1.UserPurchaseContentsRoutes,
+    },
+    {
+        path: "/payment",
+        routes: payment_routes_1.PaymentRoutes,
+    },
+    {
+        path: "/content-links",
+        routes: contentLinks_routes_1.ContentLinksRoutes,
     },
 ];
 moduleRoutes.forEach(({ path, routes }) => {

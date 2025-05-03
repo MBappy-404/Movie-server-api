@@ -6,13 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserValidation = void 0;
 const zod_1 = __importDefault(require("zod"));
 const createUserValidation = zod_1.default.object({
-    body: zod_1.default.object({
-        name: zod_1.default.string({ required_error: "Name is reqired" }),
-        email: zod_1.default.string({ required_error: "Email is reqired" }),
-        password: zod_1.default.string({ required_error: "Password is reqired" }),
-        contactNumber: zod_1.default.string({ required_error: "Contact Number is reqired" })
-    })
+    name: zod_1.default.string({ required_error: "Name is reqired" }),
+    email: zod_1.default.string({ required_error: "Email is reqired" }),
+    password: zod_1.default.string({ required_error: "Password is reqired" }),
+    contactNumber: zod_1.default.string({ required_error: "Contact Number is reqired" })
+});
+const updateUserValidation = zod_1.default.object({
+    name: zod_1.default.string().optional(),
+    email: zod_1.default.string().optional(),
+    contactNumber: zod_1.default.string().optional(),
+    role: zod_1.default.string().optional(),
 });
 exports.UserValidation = {
-    createUserValidation
+    createUserValidation,
+    updateUserValidation
 };
