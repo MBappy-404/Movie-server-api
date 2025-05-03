@@ -12,63 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.platformController = void 0;
+exports.ContentLinksController = void 0;
 const catchAsync_1 = require("../../helper/catchAsync");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
-const platform_service_1 = require("./platform.service");
+const contentLinks_service_1 = require("./contentLinks.service");
 const http_status_1 = __importDefault(require("http-status"));
-const createPlaform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
-    const result = yield platform_service_1.platformService.createPlatfromIntoDB(req);
+const createContentLinksIntoDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield contentLinks_service_1.ContentLinksService.createContentLinksIntoDB(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
-        message: "Platform created successfully",
+        message: "ContentLinks created successfully",
         data: result,
     });
 }));
-const getAllPlatforms = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield platform_service_1.platformService.getAllPlatformsFromDB();
+const getAllContentLinksFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield contentLinks_service_1.ContentLinksService.getAllContentLinksFromDB();
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Platforms retrieved successfully",
+        message: "ContentLinks retrieved successfully",
         data: result,
     });
 }));
-const getSinglePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getSingleContentLinksFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield platform_service_1.platformService.getSinglePlatformFromDB(id);
+    const result = yield contentLinks_service_1.ContentLinksService.getSingleContentLinksFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Platform retrieved successfully",
+        message: "ContentLinks retrieved successfully",
         data: result,
     });
 }));
-const updatePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield platform_service_1.platformService.updatePlatformIntoDB(req);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Platform updated successfully",
-        data: result,
-    });
-}));
-const deletePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateContentLinksIntoDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield platform_service_1.platformService.deletePlatformFromDB(id);
+    const result = yield contentLinks_service_1.ContentLinksService.updateContentLinksIntoDB(id, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Platform deleted successfully",
+        message: "ContentLinks updated successfully",
         data: result,
     });
 }));
-exports.platformController = {
-    createPlaform,
-    getAllPlatforms,
-    getSinglePlatform,
-    updatePlatform,
-    deletePlatform,
+const deleteContentLinksFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield contentLinks_service_1.ContentLinksService.deleteContentLinksFromDB(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "ContentLinks deleted successfully",
+        data: result,
+    });
+}));
+exports.ContentLinksController = {
+    createContentLinksIntoDB,
+    getAllContentLinksFromDB,
+    getSingleContentLinksFromDB,
+    updateContentLinksIntoDB,
+    deleteContentLinksFromDB,
 };

@@ -20,7 +20,7 @@ const content_service_1 = require("./content.service");
 const pick_1 = __importDefault(require("../../utils/pick"));
 const content_constant_1 = require("./content.constant");
 const createContent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield content_service_1.ContentServices.createContentIntoDB(req.body);
+    const result = yield content_service_1.ContentServices.createContentIntoDB(req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
@@ -60,9 +60,19 @@ const getAllContentData = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(v
         data: result.data
     });
 }));
+const updateContent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield content_service_1.ContentServices.updateContentIntoDB(req);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Content is updated Successfully!",
+        data: result,
+    });
+}));
 exports.ContentController = {
     createContent,
     getSingleContent,
     deleteSingleContent,
     getAllContentData,
+    updateContent,
 };

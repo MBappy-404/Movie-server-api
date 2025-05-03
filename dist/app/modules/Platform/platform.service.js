@@ -14,9 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.platformService = void 0;
 const prisma_1 = __importDefault(require("../../helper/prisma"));
-const createPlatfromIntoDB = (platform) => __awaiter(void 0, void 0, void 0, function* () {
+const fileUploader_1 = require("../../helper/fileUploader");
+const createPlatfromIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    if (file) {
+        const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+        req.body.platformLogo = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+    }
     const result = yield prisma_1.default.platform.create({
-        data: platform,
+        data: req.body,
     });
     return result;
 });
@@ -32,17 +38,23 @@ const getSinglePlatformFromDB = (id) => __awaiter(void 0, void 0, void 0, functi
     });
     return result;
 });
-const updatePlatformIntoDB = (id, platform) => __awaiter(void 0, void 0, void 0, function* () {
+const updatePlatformIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
     yield prisma_1.default.platform.findUniqueOrThrow({
         where: {
             id,
         },
     });
+    const file = req.file;
+    if (file) {
+        const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+        req.body.platformLogo = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+    }
     const result = yield prisma_1.default.platform.update({
         where: {
             id,
         },
-        data: platform,
+        data: req.body,
     });
     return result;
 });
