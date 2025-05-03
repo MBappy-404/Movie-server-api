@@ -21,21 +21,27 @@ const config_1 = __importDefault(require("../config"));
 cloudinary_1.v2.config({
     cloud_name: config_1.default.cloudinary.cloud_name,
     api_key: config_1.default.cloudinary.api_key,
-    api_secret: config_1.default.cloudinary.api_secret // Click 'View API Keys' above to copy your API secret
+    api_secret: config_1.default.cloudinary.api_secret
 });
+// Use /tmp (writable) instead of project directory (read-only)
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path_1.default.join(process.cwd(), 'uploads'));
+        cb(null, path_1.default.join(process.cwd(), 'tmp')); // writable directory in Lambda
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        cb(null, Date.now() + '-' + file.originalname); // add timestamp to avoid collisions
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
 const uploadToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((resolve, reject) => {
         cloudinary_1.v2.uploader.upload(file.path, (error, result) => {
-            fs_1.default.unlinkSync(file.path);
+            try {
+                fs_1.default.unlinkSync(file.path); // cleanup
+            }
+            catch (e) {
+                console.error('Error deleting temp file:', e);
+            }
             if (error) {
                 reject(error);
             }
