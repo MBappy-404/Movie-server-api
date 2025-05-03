@@ -2,7 +2,6 @@ import { catchAsync } from "../../helper/catchAsync";
 import sendResponse from "../../helper/sendResponse";
 import { ReviewsService } from "./reviews.service";
 import httpStatus from "http-status";
-import { Request, Response } from "express";
 
 const addReviews = catchAsync(async (req, res) => {
   const result = await ReviewsService.addReviews(req.body);
@@ -22,13 +21,14 @@ const getAllReviews = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getSingleReviews = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await ReviewsService.getSingleReviews(id);
+
+const getAllReviewsById = catchAsync(async (req, res) => {
+  const {contentId} = req.params
+  const result = await ReviewsService.getAllReviewByContentId(contentId);
   sendResponse(res, {
-    statusCode: httpStatus.FOUND,
+    statusCode: httpStatus.OK,
     success: true,
-    message: "Review fetched successfully",
+    message: "Reviews fetched successfully",
     data: result,
   });
 });
@@ -66,8 +66,8 @@ const getReviewStats = catchAsync(async (req, res) => {
 export const ReviewsController = {
   addReviews,
   getAllReviews,
-  getSingleReviews,
   updateReview,
   deleteReview,
   getReviewStats,
+  getAllReviewsById
 };

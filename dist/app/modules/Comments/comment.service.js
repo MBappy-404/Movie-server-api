@@ -54,27 +54,49 @@ const deleteComment = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
-const getSingleComment = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.comment.findMany({
-        where: {
-            reviewId: id,
-            parentId: null,
-        },
-        include: {
-            user: true,
-            replies: {
-                include: {
-                    user: true,
-                    replies: {
-                        include: {
-                            user: true,
+const getSingleComment = (id_1, ...args_1) => __awaiter(void 0, [id_1, ...args_1], void 0, function* (id, page = 1, limit = 5) {
+    const skip = (page - 1) * limit;
+    const [comments, total] = yield Promise.all([
+        prisma_1.default.comment.findMany({
+            where: {
+                reviewId: id,
+                parentId: null,
+            },
+            include: {
+                user: true,
+                replies: {
+                    include: {
+                        user: true,
+                        replies: {
+                            include: {
+                                user: true,
+                            },
                         },
                     },
                 },
             },
-        },
-    });
-    return result;
+            skip,
+            take: limit,
+            orderBy: {
+                createdAt: 'desc'
+            }
+        }),
+        prisma_1.default.comment.count({
+            where: {
+                reviewId: id,
+                parentId: null,
+            }
+        })
+    ]);
+    return {
+        data: comments,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
 });
 exports.CommentServices = {
     addComment,

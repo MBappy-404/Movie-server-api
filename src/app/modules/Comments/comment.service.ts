@@ -53,28 +53,51 @@ const deleteComment = async (id: string) => {
   return result;
 };
 
-const getSingleComment = async (id: string) => {
-  const result = await prisma.comment.findMany({
-    where: {
-      reviewId: id,
-      parentId: null,
-    },
-    include: {
-      user: true,
-      replies: {
-        include: {
-          user: true,
-          replies: {
-            include: {
-              user: true,
+const getSingleComment = async (id: string, page: number = 1, limit: number = 5) => {
+  const skip = (page - 1) * limit;
+
+  const [comments, total] = await Promise.all([
+    prisma.comment.findMany({
+      where: {
+        reviewId: id,
+        parentId: null,
+      },
+      include: {
+        user: true,
+        replies: {
+          include: {
+            user: true,
+            replies: {
+              include: {
+                user: true,
+              },
             },
           },
         },
       },
-    },
-  });
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    }),
+    prisma.comment.count({
+      where: {
+        reviewId: id,
+        parentId: null,
+      }
+    })
+  ]);
 
-  return result;
+  return {
+    data: comments,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  };
 };
 
 export const CommentServices = {

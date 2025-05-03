@@ -14,7 +14,9 @@ router.post(
   ReviewsController.addReviews
 );
 router.get("/", ReviewsController.getAllReviews);
-router.get("/:id", ReviewsController.getSingleReviews);
+router.get("/:contentId", ReviewsController.getAllReviewsById);
+// router.get("/:id", ReviewsController.getSingleReviews);
+
 router.patch(
   "/:id",
   validateRequest(ReviewValidations.updateReviewValidationSchema),

@@ -57,12 +57,15 @@ const deleteComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
 }));
 const getSingleComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield comment_service_1.CommentServices.getSingleComment(id);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 5;
+    const result = yield comment_service_1.CommentServices.getSingleComment(id, page, limit);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Comments are retrieved successfully",
-        data: result,
+        message: "Comments fetched successfully",
+        data: result.data,
+        meta: result.meta
     });
 }));
 exports.CommentController = {

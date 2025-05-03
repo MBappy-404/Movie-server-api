@@ -45,14 +45,16 @@ const deleteComment = catchAsync(async (req, res) => {
 
 const getSingleComment = catchAsync(async (req, res) => {
   const { id } = req.params;
-
-  const result = await CommentServices.getSingleComment(id);
-
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 5;
+  
+  const result = await CommentServices.getSingleComment(id, page, limit);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Comments are retrieved successfully",
-    data: result,
+    message: "Comments fetched successfully",
+    data: result.data,
+    meta: result.meta
   });
 });
 

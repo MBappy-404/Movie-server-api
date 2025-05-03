@@ -47,21 +47,11 @@ const getAllReviewByContentId = (contentId) => __awaiter(void 0, void 0, void 0,
     const result = yield prisma_1.default.reviews.findMany({
         where: { contentId },
         include: {
+            user: true,
             comment: true,
             like: true,
         },
         orderBy: { createdAt: 'desc' },
-    });
-    return result;
-});
-const getSingleReviews = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.reviews.findUnique({
-        where: {
-            id,
-        },
-        include: {
-            comment: true,
-        }
     });
     return result;
 });
@@ -124,7 +114,6 @@ const getReviewStats = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.ReviewsService = {
     addReviews,
     getAllReviews,
-    getSingleReviews,
     updateReview,
     deleteReview,
     getReviewStats,

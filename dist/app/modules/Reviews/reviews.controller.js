@@ -35,13 +35,13 @@ const getAllReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
         data: result,
     });
 }));
-const getSingleReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield reviews_service_1.ReviewsService.getSingleReviews(id);
+const getAllReviewsById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { contentId } = req.params;
+    const result = yield reviews_service_1.ReviewsService.getAllReviewByContentId(contentId);
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.FOUND,
+        statusCode: http_status_1.default.OK,
         success: true,
-        message: "Review fetched successfully",
+        message: "Reviews fetched successfully",
         data: result,
     });
 }));
@@ -77,8 +77,8 @@ const getReviewStats = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
 exports.ReviewsController = {
     addReviews,
     getAllReviews,
-    getSingleReviews,
     updateReview,
     deleteReview,
     getReviewStats,
+    getAllReviewsById
 };

@@ -43,25 +43,11 @@ const getAllReviewByContentId = async (contentId: string) => {
   const result = await prisma.reviews.findMany({
     where: {contentId},
     include:{
+      user: true,
       comment:true,
       like:true,
     },
     orderBy: {createdAt: 'desc'},
-  });
-  return result;
-};
-
-
-const getSingleReviews = async (id: string) => {
-
-
-  const result = await prisma.reviews.findUnique({
-    where: {
-      id,
-    },
-    include:{
-      comment:true,
-    }
   });
   return result;
 };
@@ -137,7 +123,6 @@ const getReviewStats = async () => {
 export const ReviewsService = {
   addReviews,
   getAllReviews,
-  getSingleReviews,
   updateReview,
   deleteReview,
   getReviewStats,
