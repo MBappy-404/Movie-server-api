@@ -21,23 +21,28 @@ const config_1 = __importDefault(require("../config"));
 cloudinary_1.v2.config({
     cloud_name: config_1.default.cloudinary.cloud_name,
     api_key: config_1.default.cloudinary.api_key,
-    api_secret: config_1.default.cloudinary.api_secret
+    api_secret: config_1.default.cloudinary.api_secret,
 });
-// Use /tmp (writable) instead of project directory (read-only)
+const isVercel = process.env.VERCEL === '1';
+const uploadPath = isVercel ? '/tmp' : path_1.default.join(process.cwd(), 'tmp');
+// Create local tmp folder if it doesn't exist
+if (!isVercel && !fs_1.default.existsSync(uploadPath)) {
+    fs_1.default.mkdirSync(uploadPath);
+}
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path_1.default.join(process.cwd(), 'tmp')); // writable directory in Lambda
+        cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname); // add timestamp to avoid collisions
-    }
+        cb(null, Date.now() + '-' + file.originalname);
+    },
 });
-const upload = (0, multer_1.default)({ storage: storage });
+const upload = (0, multer_1.default)({ storage });
 const uploadToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((resolve, reject) => {
         cloudinary_1.v2.uploader.upload(file.path, (error, result) => {
             try {
-                fs_1.default.unlinkSync(file.path); // cleanup
+                fs_1.default.unlinkSync(file.path);
             }
             catch (e) {
                 console.error('Error deleting temp file:', e);
@@ -53,5 +58,5 @@ const uploadToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.FileUploader = {
     upload,
-    uploadToCloudinary
+    uploadToCloudinary,
 };
