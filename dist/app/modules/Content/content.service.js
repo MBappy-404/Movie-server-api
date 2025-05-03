@@ -231,6 +231,7 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
         include: {
             genre: true,
             platform: true,
+            ContentLinks: true,
             reviews: {
                 include: {
                     comment: true,

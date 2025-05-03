@@ -73,6 +73,17 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
             [options.sortBy]: options.sortOrder
         } : {
             createdAt: 'desc'
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            profilePhoto: true,
+            status: true,
+            contactNumber: true,
+            createdAt: true,
+            updatedAt: true
         }
 
     })
@@ -93,7 +104,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 
 const getUserByIdIntoDB = async (id: string) => {
     const verify = await prisma.user.findUnique({
-        where: { id }
+        where: { id },
     })
     if (!verify) {
         throw new AppError(
@@ -102,7 +113,18 @@ const getUserByIdIntoDB = async (id: string) => {
         );
     }
     const result = await prisma.user.findUnique({
-        where: { id }
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            profilePhoto: true,
+            status: true,
+            contactNumber: true,
+            createdAt: true,
+            updatedAt: true
+        }
     })
     return result
 }

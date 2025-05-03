@@ -41,7 +41,7 @@ model Genre {
 
 model ContentLinks {
   id          String   @id @default(uuid())
-  contentId   String
+  contentId   String   @unique
   content     Content  @relation(fields: [contentId], references: [id])
   contentLink String
   createdAt   DateTime @default(now())
@@ -58,13 +58,14 @@ model Content {
   duration             String
   thumbnail            String
   price                Float
+  rentprice            Float
   director             String
   producer             String
   actor                String
   actress              String
-  spoilerWarning       String
+  spoilerWarning       String?
   synopsis             String
-  isAvailable          Boolean                @default(false)
+  isAvailable          Boolean                @default(true)
   platformId           String
   platform             Platform               @relation(fields: [platformId], references: [id])
   genreId              String
@@ -74,7 +75,7 @@ model Content {
   reviews              Reviews[]
   userPurchaseContents UserPurchaseContents[]
   payments             Payment[]
-  contentLinks         ContentLinks[]
+  ContentLinks         ContentLinks?
 
   @@map("contents")
 }

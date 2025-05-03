@@ -259,6 +259,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     include: {
       genre: true,
       platform: true,
+      ContentLinks: true,
       reviews: {
         include: {
           comment: true,

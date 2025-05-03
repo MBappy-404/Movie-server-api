@@ -121,6 +121,17 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
             [options.sortBy]: options.sortOrder
         } : {
             createdAt: 'desc'
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            profilePhoto: true,
+            status: true,
+            contactNumber: true,
+            createdAt: true,
+            updatedAt: true
         }
     });
     const total = yield prisma_1.default.user.count({
@@ -137,13 +148,24 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
 });
 const getUserByIdIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const verify = yield prisma_1.default.user.findUnique({
-        where: { id }
+        where: { id },
     });
     if (!verify) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'User Not found!');
     }
     const result = yield prisma_1.default.user.findUnique({
-        where: { id }
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            profilePhoto: true,
+            status: true,
+            contactNumber: true,
+            createdAt: true,
+            updatedAt: true
+        }
     });
     return result;
 });
