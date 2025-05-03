@@ -16,7 +16,7 @@ const app_1 = __importDefault(require("./app"));
 const PORT = process.env.PORT || 5000;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const server = app_1.default.listen(PORT, () => {
+        app_1.default.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
     });

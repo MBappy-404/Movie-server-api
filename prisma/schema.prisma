@@ -8,8 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
   id            String     @id @default(uuid())
   name          String
@@ -21,6 +19,75 @@ model User {
   profilePhoto  String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+
+  reviews Reviews[]
+  comment Comment[]
+
+  userPurchaseContents UserPurchaseContents[]
+  payments             Payment[]
+
+  like Like[]
+}
+
+model Genre {
+  id        String    @id @default(uuid())
+  genreName String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
+
+  @@map("genres")
+}
+
+model ContentLinks {
+  id          String   @id @default(uuid())
+  contentId   String
+  content     Content  @relation(fields: [contentId], references: [id])
+  contentLink String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contentLinks")
+}
+
+model Content {
+  id String @id @default(uuid())
+
+  title                String
+  releaseYear          String
+  duration             String
+  thumbnail            String
+  price                Float
+  director             String
+  producer             String
+  actor                String
+  actress              String
+  spoilerWarning       String
+  synopsis             String
+  isAvailable          Boolean                @default(false)
+  platformId           String
+  platform             Platform               @relation(fields: [platformId], references: [id])
+  genreId              String
+  genre                Genre                  @relation(fields: [genreId], references: [id])
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  reviews              Reviews[]
+  userPurchaseContents UserPurchaseContents[]
+  payments             Payment[]
+  contentLinks         ContentLinks[]
+
+  @@map("contents")
+}
+
+model Platform {
+  id           String    @id @default(uuid())
+  platformName String
+  platformLogo String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  content      Content[]
+
+  @@map("platforms")
 }
 
 enum UserRole {
@@ -32,4 +99,118 @@ enum UserStatus {
   ACTIVE
   BLOCKED
   DELETED
+}
+
+model Reviews {
+  id         String       @id @default(uuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  contentId  String
+  content    Content      @relation(fields: [contentId], references: [id])
+  reviewText String
+  rating     Float
+  spoiler    Boolean      @default(false)
+  status     ReviewStatus @default(PENDING)
+  tags       ReviewTags   @default(CLASSIC)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  comment    Comment[]
+  like       Like[]
+
+  @@map("reviews")
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  PENDING
+  DELETED
+}
+
+enum ReviewTags {
+  CLASSIC
+  UNDERRATED
+}
+
+model Comment {
+  id       String  @id @default(uuid())
+  reviewId String
+  review   Reviews @relation(fields: [reviewId], references: [id])
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+  comment  String
+
+  parentId String? // For nested replies
+  parent   Comment?  @relation("CommentToReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentToReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
+}
+
+model Like {
+  id        String     @id @default(uuid())
+  reviewId  String
+  review    Reviews    @relation(fields: [reviewId], references: [id])
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  status    LikeStatus
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("likes")
+}
+
+enum LikeStatus {
+  LIKED
+  DISLIKED
+}
+
+enum purchaseStatus {
+  RENTED
+  BOUGHT
+}
+
+model UserPurchaseContents {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id])
+
+  movieLink String
+
+  status    purchaseStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, contentId])
+  @@map("userPurchaseContents")
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+}
+
+model Payment {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id])
+
+  purchaseStatus purchaseStatus
+
+  amount        Float
+  transactionId String        @unique
+  status        PaymentStatus @default(UNPAID)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, contentId])
+  @@map("payments")
 }

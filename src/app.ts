@@ -1,16 +1,27 @@
 import express, { NextFunction, Request, Response }  from "express";
 import cors from "cors";
+import cookieParser from 'cookie-parser'
 import  HttpStatus  from "http-status";
-import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import router from "./app/routes";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
+import { AuthRoutes } from "./app/modules/Auth/auth.route";
 
 // middlewares 
 const app = express();
 app.use(express.json());
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000'], // Allow requests from this specific origi,
+  credentials: true 
+},
+));
+
+
+app.use('/api', router)
 
 app.get("/", (req, res) => {
-  res.send("Movie server is running");
+  res.send("Movie server is running!!");
 });
 
  
