@@ -12,63 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.platformController = void 0;
+exports.CommentController = void 0;
 const catchAsync_1 = require("../../helper/catchAsync");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
-const platform_service_1 = require("./platform.service");
 const http_status_1 = __importDefault(require("http-status"));
-const createPlaform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
-    const result = yield platform_service_1.platformService.createPlatfromIntoDB(req);
+const comment_service_1 = require("./comment.service");
+const addComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield comment_service_1.CommentServices.addComment(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
-        message: "Platform created successfully",
+        message: "Comment added successfully",
         data: result,
     });
 }));
-const getAllPlatforms = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield platform_service_1.platformService.getAllPlatformsFromDB();
+const getAllComments = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield comment_service_1.CommentServices.getAllComments();
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
+        statusCode: http_status_1.default.FOUND,
         success: true,
-        message: "Platforms retrieved successfully",
+        message: "Comments fetched successfully",
         data: result,
     });
 }));
-const getSinglePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield platform_service_1.platformService.getSinglePlatformFromDB(id);
+    const result = yield comment_service_1.CommentServices.updateComment(id, req.body);
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
+        statusCode: http_status_1.default.FOUND,
         success: true,
-        message: "Platform retrieved successfully",
+        message: " Comment updated successfully",
         data: result,
     });
 }));
-const updatePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield platform_service_1.platformService.updatePlatformIntoDB(req);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "Platform updated successfully",
-        data: result,
-    });
-}));
-const deletePlatform = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield platform_service_1.platformService.deletePlatformFromDB(id);
+    const result = yield comment_service_1.CommentServices.deleteComment(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Platform deleted successfully",
+        message: "Comment deleted successfully",
+        // data: result
+    });
+}));
+const getSingleComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield comment_service_1.CommentServices.getSingleComment(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Comments are retrieved successfully",
         data: result,
     });
 }));
-exports.platformController = {
-    createPlaform,
-    getAllPlatforms,
-    getSinglePlatform,
-    updatePlatform,
-    deletePlatform,
+exports.CommentController = {
+    addComment,
+    getAllComments,
+    updateComment,
+    deleteComment,
+    getSingleComment,
 };

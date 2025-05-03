@@ -64,12 +64,29 @@ const prisma_1 = __importDefault(require("../../helper/prisma"));
 const user_constant_1 = require("./user.constant");
 const bcrypt = __importStar(require("bcrypt"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
-const UserRegisterIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const hashedPassword = yield bcrypt.hash(payload.password, 12); //  hash password
-    payload.password = hashedPassword;
-    const result = prisma_1.default.user.create({
-        data: payload
-    });
+const fileUploader_1 = require("../../helper/fileUploader");
+const UserRegisterIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    if (file) {
+        const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+        req.body.profilePhoto = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+    }
+    const hashedPassword = yield bcrypt.hash(req.body.password, 12); //  hash password
+    req.body.password = hashedPassword;
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const verifyUser = yield tx.user.findFirst({
+            where: {
+                email: req.body.email
+            }
+        });
+        if (verifyUser) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already Created");
+        }
+        const createUser = prisma_1.default.user.create({
+            data: req.body
+        });
+        return createUser;
+    }));
     return result;
 });
 const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -139,15 +156,24 @@ const deleteUserIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () 
     });
     return result;
 });
-const updateUserIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const verifyUser = yield prisma_1.default.user.findUniqueOrThrow({
-        where: { id, status: client_1.UserStatus.ACTIVE }
-    });
-    const update = yield prisma_1.default.user.update({
-        where: { email: verifyUser.email },
-        data: payload
-    });
-    return update;
+const updateUserIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const file = req.file;
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const verifyUser = yield tx.user.findUniqueOrThrow({
+            where: { id, status: client_1.UserStatus.ACTIVE }
+        });
+        if (file) {
+            const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+            req.body.profilePhoto = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+        }
+        const update = yield prisma_1.default.user.update({
+            where: { id, email: verifyUser.email },
+            data: req.body
+        });
+        return update;
+    }));
+    return result;
 });
 exports.UserServices = {
     UserRegisterIntoDB,

@@ -20,7 +20,7 @@ const pick_1 = __importDefault(require("../../utils/pick"));
 const user_constant_1 = require("./user.constant");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
 const RegisterUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserServices.UserRegisterIntoDB(req.body);
+    const result = yield user_service_1.UserServices.UserRegisterIntoDB(req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
@@ -60,8 +60,7 @@ const DeleteUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
     });
 }));
 const UpdateUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield user_service_1.UserServices.updateUserIntoDB(id, req.body);
+    const result = yield user_service_1.UserServices.updateUserIntoDB(req);
     (0, sendResponse_1.default)(res, {
         success: true,
         message: "User update successfully!!",

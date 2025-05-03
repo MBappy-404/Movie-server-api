@@ -26,10 +26,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentServices = void 0;
 const prisma_1 = __importDefault(require("../../helper/prisma"));
 const paginationHelper_1 = require("../../helper/paginationHelper");
-const createContentIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.content.create({
-        data: payload,
-    });
+const fileUploader_1 = require("../../helper/fileUploader");
+const AppError_1 = __importDefault(require("../../errors/AppError"));
+const http_status_1 = __importDefault(require("http-status"));
+const createContentIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    const datainfo = req.body;
+    if (file) {
+        const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+        req.body.content.thumbnail = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+    }
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const data = datainfo.content;
+        const content = yield tx.content.create({
+            data: Object.assign({}, data),
+        });
+        yield tx.contentLinks.create({
+            data: {
+                contentId: content.id,
+                contentLink: datainfo.contentLink,
+            },
+        });
+        return content;
+    }));
     return result;
 });
 const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,6 +60,17 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     const result = yield prisma_1.default.content.findUnique({
         where: {
             id,
+        },
+        include: {
+            genre: true,
+            platform: true,
+            reviews: {
+                include: {
+                    _count: {
+                        select: { like: true },
+                    }
+                },
+            },
         },
     });
     return result;
@@ -58,17 +88,26 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
     });
 });
 const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { page, limit, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm, genre, platform } = params, filterData = __rest(params, ["searchTerm", "genre", "platform"]);
     const andCondition = [];
     if (searchTerm) {
         andCondition.push({
             OR: [
-                { title: { contains: searchTerm, mode: 'insensitive' } },
-                { synopsis: { contains: searchTerm, mode: 'insensitive' } },
-                { genre: { genreName: { contains: searchTerm, mode: 'insensitive' } } },
-                { platform: { platformName: { contains: searchTerm, mode: 'insensitive' } } }
-            ]
+                { title: { contains: searchTerm, mode: "insensitive" } },
+                { synopsis: { contains: searchTerm, mode: "insensitive" } },
+                { releaseYear: { contains: searchTerm, mode: "insensitive" } },
+                { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
+                {
+                    platform: {
+                        platformName: { contains: searchTerm, mode: "insensitive" },
+                    },
+                },
+                { director: { contains: searchTerm, mode: "insensitive" } },
+                { actor: { contains: searchTerm, mode: "insensitive" } },
+                { actress: { contains: searchTerm, mode: "insensitive" } },
+            ],
         });
     }
     if (genre && genre.length > 0) {
@@ -76,9 +115,9 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
             genre: {
                 genreName: {
                     contains: genre,
-                    mode: "insensitive"
-                }
-            }
+                    mode: "insensitive",
+                },
+            },
         });
     }
     if (platform && platform.length > 0) {
@@ -86,30 +125,80 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
             platform: {
                 platformName: {
                     contains: platform,
-                    mode: "insensitive"
-                }
-            }
+                    mode: "insensitive",
+                },
+            },
         });
     }
     if (Object.keys(filterData).length > 0) {
         andCondition.push({
-            AND: Object.keys(filterData).map(key => ({
+            AND: Object.keys(filterData).map((key) => ({
                 [key]: {
-                    equals: filterData[key]
-                }
-            }))
+                    equals: filterData[key],
+                },
+            })),
         });
     }
-    let orderBy = { createdAt: 'desc' }; // default
+    const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};
+    let orderBy = { createdAt: "desc" }; // default
     if (options.sortBy) {
+        const sortOrder = ((_a = options.sortOrder) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "asc" ? "asc" : "desc";
         switch (options.sortBy) {
-            case 'rating':
-                orderBy = { price: 'desc' };
-                break;
-            case 'reviews':
-                orderBy = { createdAt: 'desc' };
-                break;
-            case 'latest':
+            case "rating":
+                // Sort by average rating from reviews
+                const contents = yield prisma_1.default.content.findMany({
+                    where: whereConditions,
+                    include: {
+                        reviews: {
+                            select: {
+                                rating: true,
+                            },
+                        },
+                    },
+                });
+                const contentsWithAvgRating = contents.map((content) => (Object.assign(Object.assign({}, content), { averageRating: content.reviews.length > 0
+                        ? content.reviews.reduce((acc, review) => acc + review.rating, 0) / content.reviews.length
+                        : 0 })));
+                contentsWithAvgRating.sort((a, b) => sortOrder === "asc"
+                    ? a.averageRating - b.averageRating
+                    : b.averageRating - a.averageRating);
+                return {
+                    meta: {
+                        page,
+                        limit,
+                        total: contents.length,
+                    },
+                    data: contentsWithAvgRating.slice(skip, skip + limit),
+                };
+            case "reviews":
+                // Sort by number of reviews
+                const contentsWithReviewCount = yield prisma_1.default.content.findMany({
+                    where: whereConditions,
+                    include: {
+                        _count: {
+                            select: { reviews: true },
+                        },
+                    },
+                    orderBy: {
+                        reviews: {
+                            _count: sortOrder,
+                        },
+                    },
+                    skip,
+                    take: limit,
+                });
+                const total = yield prisma_1.default.content.count({
+                    where: whereConditions,
+                });
+                return {
+                    meta: {
+                        page,
+                        limit,
+                        total,
+                    },
+                    data: contentsWithReviewCount,
+                };
+            case "latest":
                 const endDate = new Date();
                 const startDate = new Date();
                 startDate.setDate(endDate.getDate() - 7);
@@ -121,11 +210,19 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
                         lte: endDate,
                     },
                 });
-                orderBy = { createdAt: 'desc' };
+                orderBy = { createdAt: sortOrder };
+                break;
+            case "title":
+                orderBy = { title: sortOrder };
+                break;
+            case "price":
+                orderBy = { price: sortOrder };
+                break;
+            case "releaseYear":
+                orderBy = { releaseYear: sortOrder };
                 break;
         }
     }
-    const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};
     const result = yield prisma_1.default.content.findMany({
         where: whereConditions,
         skip,
@@ -134,6 +231,12 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
         include: {
             genre: true,
             platform: true,
+            reviews: {
+                include: {
+                    comment: true,
+                    like: true,
+                },
+            },
         },
     });
     const total = yield prisma_1.default.content.count({
@@ -147,6 +250,49 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
         },
         data: result,
     };
+});
+const updateContentIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const file = req.file;
+    if (file) {
+        const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);
+        req.body.content.thumbnail = uploadData === null || uploadData === void 0 ? void 0 : uploadData.secure_url;
+    }
+    const verifycontent = yield prisma_1.default.content.findUnique({
+        where: { id }
+    });
+    if (!verifycontent) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Content is not found!!");
+    }
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // Update content
+        const updatedContent = yield tx.content.update({
+            where: { id },
+            data: req.body.content
+        });
+        // Update content link if provided
+        if (req.body.contentLink) {
+            const contentLink = yield tx.contentLinks.findFirst({
+                where: { contentId: id }
+            });
+            if (contentLink) {
+                yield tx.contentLinks.update({
+                    where: { id: contentLink.id },
+                    data: { contentLink: req.body.contentLink }
+                });
+            }
+            else {
+                yield tx.contentLinks.create({
+                    data: {
+                        contentId: id,
+                        contentLink: req.body.contentLink
+                    }
+                });
+            }
+        }
+        return updatedContent;
+    }));
+    return result;
 });
 // const searchAndFilterContent = async (query: {
 //   searchTerm?: string;
@@ -254,4 +400,5 @@ exports.ContentServices = {
     getSingleContentFromDB,
     deleteSingleContentFromDB,
     getAllFromDB,
+    updateContentIntoDB
 };

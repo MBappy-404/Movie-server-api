@@ -70,8 +70,10 @@ const loginUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function*
     }
     const jwtPayloadData = {
         id: userData.id,
+        name: userData.name,
         email: userData.email,
         role: userData.role,
+        profilePhoto: userData.profilePhoto,
         status: userData.status
     };
     const accessToken = (0, generateToken_1.default)(jwtPayloadData, config_1.default.jwt.jwt_access_secret, config_1.default.jwt.jwt_access_expires_in);
@@ -97,8 +99,10 @@ const refreshTokenIntoDB = (token) => __awaiter(void 0, void 0, void 0, function
     }
     const jwtPayloadData = {
         id: userData.id,
+        name: userData.name,
         email: userData.email,
         role: userData.role,
+        profilePhoto: userData.profilePhoto,
         status: userData.status
     };
     const accessToken = (0, generateToken_1.default)(jwtPayloadData, config_1.default.jwt.jwt_access_secret, config_1.default.jwt.jwt_access_expires_in);
