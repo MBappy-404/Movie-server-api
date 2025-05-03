@@ -38,7 +38,8 @@ const getAllReviews = () => __awaiter(void 0, void 0, void 0, function* () {
         include: {
             comment: true,
             like: true,
-        }
+        },
+        orderBy: { createdAt: 'desc' },
     });
     return result;
 });

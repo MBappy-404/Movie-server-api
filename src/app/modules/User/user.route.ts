@@ -15,7 +15,7 @@ router.post(
     return UserController.RegisterUser(req, res, next)
   }
 );
-router.get("/", auth(UserRole.ADMIN), UserController.getAllUserData);
+router.get("/", UserController.getAllUserData);
 router.get("/:id", UserController.getUserById);
 router.patch(
   "/:id",

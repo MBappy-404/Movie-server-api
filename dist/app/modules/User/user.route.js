@@ -15,7 +15,7 @@ router.post("/register", fileUploader_1.FileUploader.upload.single('file'), (req
     req.body = user_validation_1.UserValidation.createUserValidation.parse(JSON.parse(req.body.data));
     return user_controller_1.UserController.RegisterUser(req, res, next);
 });
-router.get("/", (0, auth_1.default)(client_1.UserRole.ADMIN), user_controller_1.UserController.getAllUserData);
+router.get("/", user_controller_1.UserController.getAllUserData);
 router.get("/:id", user_controller_1.UserController.getUserById);
 router.patch("/:id", (0, auth_1.default)(client_1.UserRole.ADMIN, client_1.UserRole.USER), fileUploader_1.FileUploader.upload.single('file'), (req, res, next) => {
     req.body = user_validation_1.UserValidation.updateUserValidation.parse(JSON.parse(req.body.data));
