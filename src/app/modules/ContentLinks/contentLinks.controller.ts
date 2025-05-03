@@ -18,7 +18,7 @@ const getAllContentLinksFromDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "ContentLinks retrieved successfully",
+    message: "ContentLinks retrieved successfully! ",
     data: result,
   });
 });
