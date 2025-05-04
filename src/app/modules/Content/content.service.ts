@@ -250,15 +250,16 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         // Calculate average rating for each content
         const contentsWithReviewCountAndRating = contentsWithReviewCount.map((content) => {
           const reviews = content.reviews as { rating: number }[];
+          const averageRating = reviews.length > 0
+            ? reviews.reduce(
+                (acc: number, review: { rating: number }) => acc + review.rating,
+                0
+              ) / reviews.length
+            : 0;
+
           return {
             ...content,
-            averageRating:
-              reviews.length > 0
-                ? reviews.reduce(
-                    (acc: number, review: { rating: number }) => acc + review.rating,
-                    0
-                  ) / reviews.length
-                : 0,
+            averageRating: Number(averageRating.toFixed(1)), // Round to 1 decimal place
             totalReviews: reviews.length
           };
         });
