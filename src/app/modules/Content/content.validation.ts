@@ -22,56 +22,43 @@ const updateContentValidationSchema = z.object({
     content: z.object({
         title: z
           .string()
-          .min(1, "Title cannot be empty")
           .optional(),
         releaseYear: z
           .string()
-          .regex(/^\d{4}$/, "Release year must be a 4-digit year")
           .optional(),
         duration: z
           .string()
-          .regex(/^\d+h \d+m$/, "Duration must be in the format 'Xh Ym'")
           .optional(),
         price: z
           .number()
-          .positive("Price must be a positive number")
           .optional(),
         director: z
           .string()
-          .min(1, "Director name cannot be empty")
           .optional(),
         producer: z
           .string()
-          .min(1, "Producer name cannot be empty")
           .optional(),
         actor: z
           .string()
-          .min(1, "Actor name cannot be empty")
           .optional(),
         actress: z
           .string()
-          .min(1, "Actress name cannot be empty")
           .optional(),
         spoilerWarning: z
           .string()
-          .min(1, "Spoiler warning cannot be empty")
           .optional(),
         synopsis: z
           .string()
-          .min(10, "Synopsis must be at least 10 characters long")
           .optional(),
         platformId: z
           .string()
-          .uuid("Platform ID must be a valid UUID")
           .optional(),
         genreId: z
           .string()
-          .uuid("Genre ID must be a valid UUID")
           .optional(),
       }),
       contentLink: z
         .string()
-        .url("Content link must be a valid URL")
         .optional(),
 });
 

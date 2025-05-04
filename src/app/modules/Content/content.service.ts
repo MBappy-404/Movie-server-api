@@ -58,6 +58,7 @@ const getSingleContentFromDB = async (id: string) => {
       platform: true,
       reviews: {
         include: {
+          user: true,
           _count: {
             select: { like: true },
           }
@@ -66,7 +67,24 @@ const getSingleContentFromDB = async (id: string) => {
     },
   });
 
-  return result;
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "Content not found");
+  }
+
+  // Calculate average rating for the specific content
+  const contentWithAvgRating = {
+    ...result,
+    averageRating:
+      result.reviews.length > 0
+        ? result.reviews.reduce(
+            (acc, review) => acc + review.rating,
+            0
+          ) / result.reviews.length
+        : 0,
+    totalReviews: result.reviews.length
+  };
+
+  return contentWithAvgRating;
 };
 
 const deleteSingleContentFromDB = async (id: string) => {
@@ -76,11 +94,18 @@ const deleteSingleContentFromDB = async (id: string) => {
     },
   });
 
-  await prisma.content.delete({
-    where: {
-      id,
-    },
-  });
+  const result = await prisma.$transaction(async(tx)=> {
+    const linkinfo = await tx.contentLinks.delete({
+      where: {
+        contentId: id
+      }
+    })
+    await tx.content.delete({
+      where: {id: linkinfo.contentId}
+    })
+    
+  })
+  return result
 };
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
@@ -155,6 +180,9 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         const contents = await prisma.content.findMany({
           where: whereConditions,
           include: {
+            genre: true,
+            platform: true,
+            ContentLinks: true,
             reviews: {
               select: {
                 rating: true,
@@ -168,9 +196,9 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           averageRating:
             content.reviews.length > 0
               ? content.reviews.reduce(
-                (acc, review) => acc + review.rating,
-                0
-              ) / content.reviews.length
+                  (acc, review) => acc + review.rating,
+                  0
+                ) / content.reviews.length
               : 0,
         }));
 
@@ -273,13 +301,25 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     where: whereConditions,
   });
 
+  // Calculate average rating for all content
+  const contentsWithAvgRating = result.map((content) => ({
+    ...content,
+    averageRating:
+      content.reviews.length > 0
+        ? content.reviews.reduce(
+            (acc, review) => acc + review.rating,
+            0
+          ) / content.reviews.length
+        : 0,
+  }));
+
   return {
     meta: {
       page,
       limit,
       total,
     },
-    data: result,
+    data: contentsWithAvgRating,
   };
 };
 

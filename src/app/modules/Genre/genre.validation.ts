@@ -6,6 +6,13 @@ const createGenre = z.object({
   }),
 });
 
+const updateGenre = z.object({
+  body: z.object({
+    genreName: z.string().optional(),
+  }),
+});
+
 export const GenreValidationSchemas = {
   createGenre,
+  updateGenre
 };

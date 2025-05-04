@@ -31,7 +31,7 @@ const getAllContentLinksFromDB = (0, catchAsync_1.catchAsync)((req, res) => __aw
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "ContentLinks retrieved successfully",
+        message: "ContentLinks retrieved successfully! ",
         data: result,
     });
 }));

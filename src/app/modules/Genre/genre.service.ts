@@ -1,4 +1,6 @@
+import AppError from "../../errors/AppError";
 import prisma from "../../helper/prisma";
+import httpStatus from "http-status";
 
 const createGenreIntoDB = async (payload: { genreName: string }) => {
   const result = await prisma.genre.create({
@@ -13,6 +15,26 @@ const getAllGenreFromDB = async () => {
 
   return result;
 };
+
+const updateUpdateFromDB = async(id: string, payload: any)=> {
+ const genreverify = await prisma.genre.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if(!genreverify){
+    throw new AppError(httpStatus.BAD_REQUEST, "Genre Not Found")
+  }
+
+  const result = await prisma.genre.update({
+    where: {id},
+    data: payload
+  })
+
+  return result
+
+}
 
 const deleteGenreFromDB = async (id: string) => {
   await prisma.genre.findUniqueOrThrow({
@@ -42,4 +64,5 @@ export const GenreServices = {
   createGenreIntoDB,
   getAllGenreFromDB,
   deleteGenreFromDB,
+  updateUpdateFromDB
 };

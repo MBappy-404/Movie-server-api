@@ -7,6 +7,12 @@ const createGenre = zod_1.z.object({
         genreName: zod_1.z.string(),
     }),
 });
+const updateGenre = zod_1.z.object({
+    body: zod_1.z.object({
+        genreName: zod_1.z.string().optional(),
+    }),
+});
 exports.GenreValidationSchemas = {
     createGenre,
+    updateGenre
 };

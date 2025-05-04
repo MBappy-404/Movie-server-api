@@ -35,6 +35,16 @@ const getAllGenre = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const updateGenre = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield genre_service_1.GenreServices.updateUpdateFromDB(id, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Genre is updated Successfully!",
+        data: result,
+    });
+}));
 const deleteGenre = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield genre_service_1.GenreServices.deleteGenreFromDB(id);
@@ -49,4 +59,5 @@ exports.GenreController = {
     createGenre,
     getAllGenre,
     deleteGenre,
+    updateGenre
 };

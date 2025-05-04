@@ -13,7 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenreServices = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const prisma_1 = __importDefault(require("../../helper/prisma"));
+const http_status_1 = __importDefault(require("http-status"));
 const createGenreIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.genre.create({
         data: payload,
@@ -22,6 +24,21 @@ const createGenreIntoDB = (payload) => __awaiter(void 0, void 0, void 0, functio
 });
 const getAllGenreFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.genre.findMany();
+    return result;
+});
+const updateUpdateFromDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const genreverify = yield prisma_1.default.genre.findFirst({
+        where: {
+            id,
+        },
+    });
+    if (!genreverify) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Genre Not Found");
+    }
+    const result = yield prisma_1.default.genre.update({
+        where: { id },
+        data: payload
+    });
     return result;
 });
 const deleteGenreFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -48,4 +65,5 @@ exports.GenreServices = {
     createGenreIntoDB,
     getAllGenreFromDB,
     deleteGenreFromDB,
+    updateUpdateFromDB
 };

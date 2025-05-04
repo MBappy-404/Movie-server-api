@@ -66,6 +66,7 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
             platform: true,
             reviews: {
                 include: {
+                    user: true,
                     _count: {
                         select: { like: true },
                     }
@@ -73,7 +74,14 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
             },
         },
     });
-    return result;
+    if (!result) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Content not found");
+    }
+    // Calculate average rating for the specific content
+    const contentWithAvgRating = Object.assign(Object.assign({}, result), { averageRating: result.reviews.length > 0
+            ? result.reviews.reduce((acc, review) => acc + review.rating, 0) / result.reviews.length
+            : 0, totalReviews: result.reviews.length });
+    return contentWithAvgRating;
 });
 const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.content.findUniqueOrThrow({
@@ -81,11 +89,17 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
             id,
         },
     });
-    yield prisma_1.default.content.delete({
-        where: {
-            id,
-        },
-    });
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const linkinfo = yield tx.contentLinks.delete({
+            where: {
+                contentId: id
+            }
+        });
+        yield tx.content.delete({
+            where: { id: linkinfo.contentId }
+        });
+    }));
+    return result;
 });
 const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -149,6 +163,9 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
                 const contents = yield prisma_1.default.content.findMany({
                     where: whereConditions,
                     include: {
+                        genre: true,
+                        platform: true,
+                        ContentLinks: true,
                         reviews: {
                             select: {
                                 rating: true,
@@ -243,13 +260,17 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
     const total = yield prisma_1.default.content.count({
         where: whereConditions,
     });
+    // Calculate average rating for all content
+    const contentsWithAvgRating = result.map((content) => (Object.assign(Object.assign({}, content), { averageRating: content.reviews.length > 0
+            ? content.reviews.reduce((acc, review) => acc + review.rating, 0) / content.reviews.length
+            : 0 })));
     return {
         meta: {
             page,
             limit,
             total,
         },
-        data: result,
+        data: contentsWithAvgRating,
     };
 });
 const updateContentIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
