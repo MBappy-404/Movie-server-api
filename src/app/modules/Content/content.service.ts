@@ -185,22 +185,25 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
             ContentLinks: true,
             reviews: {
               select: {
-                rating: true,
-              },
-            },
-          },
+                rating: true
+              }
+            }
+          }
         });
 
-        const contentsWithAvgRating = contents.map((content) => ({
-          ...content,
-          averageRating:
-            content.reviews.length > 0
-              ? content.reviews.reduce(
-                  (acc, review) => acc + review.rating,
-                  0
-                ) / content.reviews.length
-              : 0,
-        }));
+        const contentsWithAvgRating = contents.map((content) => {
+          const reviews = content.reviews as { rating: number }[];
+          return {
+            ...content,
+            averageRating:
+              reviews.length > 0
+                ? reviews.reduce(
+                    (acc: number, review: { rating: number }) => acc + review.rating,
+                    0
+                  ) / reviews.length
+                : 0
+          };
+        });
 
         contentsWithAvgRating.sort((a, b) =>
           sortOrder === "asc"
@@ -222,14 +225,19 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         const contentsWithReviewCount = await prisma.content.findMany({
           where: whereConditions,
           include: {
-            _count: {
-              select: { reviews: true },
-            },
+            genre: true,
+            platform: true,
+            ContentLinks: true,
+            reviews: {
+              select: {
+                rating: true
+              }
+            }
           },
           orderBy: {
             reviews: {
-              _count: sortOrder,
-            },
+              _count: sortOrder
+            }
           },
           skip,
           take: limit,
@@ -239,13 +247,29 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           where: whereConditions,
         });
 
+        // Calculate average rating for each content
+        const contentsWithReviewCountAndRating = contentsWithReviewCount.map((content) => {
+          const reviews = content.reviews as { rating: number }[];
+          return {
+            ...content,
+            averageRating:
+              reviews.length > 0
+                ? reviews.reduce(
+                    (acc: number, review: { rating: number }) => acc + review.rating,
+                    0
+                  ) / reviews.length
+                : 0,
+            totalReviews: reviews.length
+          };
+        });
+
         return {
           meta: {
             page,
             limit,
             total,
           },
-          data: contentsWithReviewCount,
+          data: contentsWithReviewCountAndRating,
         };
 
       case "latest":
@@ -279,6 +303,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     }
   }
 
+  // Default query for all other cases
   const result = await prisma.content.findMany({
     where: whereConditions,
     skip,
@@ -287,12 +312,12 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     include: {
       genre: true,
       platform: true,
+      ContentLinks: true,
       reviews: {
-        include: {
-          comment: true,
-          like: true,
-        },
-      },
+        select: {
+          rating: true
+        }
+      }
     },
   });
 
@@ -301,16 +326,20 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   });
 
   // Calculate average rating for all content
-  const contentsWithAvgRating = result.map((content) => ({
-    ...content,
-    averageRating:
-      content.reviews.length > 0
-        ? content.reviews.reduce(
-            (acc, review) => acc + review.rating,
-            0
-          ) / content.reviews.length
-        : 0,
-  }));
+  const contentsWithAvgRating = result.map((content) => {
+    const reviews = content.reviews as { rating: number }[];
+    return {
+      ...content,
+      averageRating:
+        reviews.length > 0
+          ? reviews.reduce(
+              (acc: number, review: { rating: number }) => acc + review.rating,
+              0
+            ) / reviews.length
+          : 0,
+      totalReviews: reviews.length
+    };
+  });
 
   return {
     meta: {
