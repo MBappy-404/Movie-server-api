@@ -12,7 +12,7 @@ router.post(
 );
 router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
 
-router.get("/my-purchase-history", auth(UserRole.USER, UserRole.ADMIN), PaymentController.MyPurchagesHistory);
+router.get("/verify-payment", auth(UserRole.USER, UserRole.ADMIN), PaymentController.getVerifyPayment);
 
 router.post("/ipn", PaymentController.validatePayment);
 

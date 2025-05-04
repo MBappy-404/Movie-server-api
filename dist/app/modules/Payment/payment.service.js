@@ -192,10 +192,11 @@ const getAllPayment = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
-const getMyPurchagesHistory = (user) => __awaiter(void 0, void 0, void 0, function* () {
+const getVerifyPayment = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.payment.findMany({
         where: {
-            userId: user.id
+            userId: user.id,
+            transactionId: payload.tran_id
         },
         include: {
             user: true,
@@ -208,5 +209,5 @@ exports.PaymentService = {
     initPayment,
     validatePayment,
     getAllPayment,
-    getMyPurchagesHistory
+    getVerifyPayment
 };

@@ -205,10 +205,11 @@ const getAllPayment = async () => {
   return result;
 };
 
-const getMyPurchagesHistory = async (user: any) => {
+const getVerifyPayment = async (user: any, payload: { tran_id?: string }) => {
   const result = await prisma.payment.findMany({
     where: {
-      userId: user.id
+      userId: user.id,
+      transactionId: payload.tran_id
     },
     include: {
       user: true,
@@ -222,5 +223,5 @@ export const PaymentService = {
   initPayment,
   validatePayment,
   getAllPayment,
-  getMyPurchagesHistory
+  getVerifyPayment
 };

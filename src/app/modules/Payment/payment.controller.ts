@@ -25,8 +25,8 @@ const getAllPayment = catchAsync(async (req, res) => {
 });
 
 
-const MyPurchagesHistory = catchAsync(async (req, res) => {
-  const result = await PaymentService.getMyPurchagesHistory(req.user);
+const getVerifyPayment = catchAsync(async (req, res) => {
+  const result = await PaymentService.getVerifyPayment(req.user, req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,5 +48,5 @@ export const PaymentController = {
   initPayment,
   validatePayment,
   getAllPayment,
-  MyPurchagesHistory
+  getVerifyPayment
 };

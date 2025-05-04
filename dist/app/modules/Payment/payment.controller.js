@@ -36,8 +36,8 @@ const getAllPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
         data: result,
     });
 }));
-const MyPurchagesHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield payment_service_1.PaymentService.getMyPurchagesHistory(req.user);
+const getVerifyPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield payment_service_1.PaymentService.getVerifyPayment(req.user, req.query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -58,5 +58,5 @@ exports.PaymentController = {
     initPayment,
     validatePayment,
     getAllPayment,
-    MyPurchagesHistory
+    getVerifyPayment
 };
