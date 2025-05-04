@@ -52,11 +52,13 @@ const initPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () 
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Payment already made!");
     }
     const trxId = `${userData === null || userData === void 0 ? void 0 : userData.id}-${contentData === null || contentData === void 0 ? void 0 : contentData.id}`;
+    // Determine the amount based on purchase status
+    const amount = payload.status === client_1.purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
     const newPayment = yield prisma_1.default.payment.create({
         data: {
             userId: userData.id,
             contentId: contentData.id,
-            amount: contentData.price,
+            amount: amount,
             transactionId: trxId,
             status: client_1.PaymentStatus.UNPAID,
             purchaseStatus: payload.status,
@@ -73,7 +75,7 @@ const initPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () 
     };
     const result = yield ssl_service_1.SSLService.initPayment(initPaymentData);
     return {
-        paymentUrl: result.GatewayPageURL,
+        paymentUrl: result,
     };
 });
 const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -133,7 +135,7 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
 
     </div>
     `);
-    return result;
+    return true;
 });
 exports.PaymentService = {
     initPayment,

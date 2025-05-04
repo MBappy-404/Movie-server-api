@@ -1,6 +1,6 @@
 import prisma from "../../helper/prisma";
 import { SSLService } from "../SSL/ssl.service";
-import { PaymentStatus } from "@prisma/client";
+import { PaymentStatus, purchaseStatus } from "@prisma/client";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { IUserPurchaseContents } from "../UserPurchaseContents/userPurchaseContents.interface";
@@ -46,11 +46,14 @@ const initPayment = async (payload: IUserPurchaseContents) => {
 
   const trxId = `${userData?.id}-${contentData?.id}`;
 
+  // Determine the amount based on purchase status
+  const amount = payload.status === purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+
   const newPayment = await prisma.payment.create({
     data: {
       userId: userData.id,
       contentId: contentData.id,
-      amount: contentData.price,
+      amount: amount,
       transactionId: trxId,
       status: PaymentStatus.UNPAID,
       purchaseStatus: payload.status,

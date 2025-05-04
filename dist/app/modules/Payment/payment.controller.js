@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentController = void 0;
+const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = require("../../helper/catchAsync");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
 const payment_service_1 = require("./payment.service");
@@ -28,12 +29,12 @@ const initPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 }));
 const validatePayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield payment_service_1.PaymentService.validatePayment(req.query);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.CREATED,
-        success: true,
-        message: "Payment validate successfully",
-        data: result,
-    });
+    if (result) {
+        res.redirect(`${config_1.default.ssl.success_url}/success`);
+    }
+    else {
+        res.redirect(`${config_1.default.ssl.failed_url}/failed`);
+    }
 }));
 exports.PaymentController = {
     initPayment,
