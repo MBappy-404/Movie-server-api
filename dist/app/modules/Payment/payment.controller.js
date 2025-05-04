@@ -19,7 +19,7 @@ const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
 const payment_service_1 = require("./payment.service");
 const http_status_1 = __importDefault(require("http-status"));
 const initPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield payment_service_1.PaymentService.initPayment(req.body);
+    const result = yield payment_service_1.PaymentService.initPayment(req.body, req.user);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,

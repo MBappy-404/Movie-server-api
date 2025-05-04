@@ -9,13 +9,15 @@ import emailSender from "./sendEmail";
 const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   const userData = await prisma.user.findUnique({
     where: {
-      id: user.id,
+      id: user?.id,
     },
   });
 
-
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+  if (userData?.status === "BLOCKED") {
+    throw new AppError(httpStatus.BAD_REQUEST, `User is ${userData?.status}`);
   }
 
   const contentData = await prisma.content.findUnique({
@@ -113,14 +115,42 @@ const validatePayment = async (payload: { tran_id?: string }) => {
       throw new AppError(httpStatus.NOT_FOUND, "Content link not found!");
     }
 
-    const purchaseData = await tx.userPurchaseContents.create({
-      data: {
-        userId: updatedPaymentData.userId,
-        contentId: updatedPaymentData.contentId,
-        movieLink: contentLinkData?.contentLink,
-        status: updatedPaymentData.purchaseStatus,
+    // Check if purchase record already exists
+    const existingPurchase = await tx.userPurchaseContents.findUnique({
+      where: {
+        userId_contentId: {
+          userId: updatedPaymentData.userId,
+          contentId: updatedPaymentData.contentId,
+        },
       },
     });
+
+    let purchaseData;
+    if (existingPurchase) {
+      // Update existing purchase record
+      purchaseData = await tx.userPurchaseContents.update({
+        where: {
+          userId_contentId: {
+            userId: updatedPaymentData.userId,
+            contentId: updatedPaymentData.contentId,
+          },
+        },
+        data: {
+          movieLink: contentLinkData.contentLink,
+          status: updatedPaymentData.purchaseStatus,
+        },
+      });
+    } else {
+      // Create new purchase record
+      purchaseData = await tx.userPurchaseContents.create({
+        data: {
+          userId: updatedPaymentData.userId,
+          contentId: updatedPaymentData.contentId,
+          movieLink: contentLinkData.contentLink,
+          status: updatedPaymentData.purchaseStatus,
+        },
+      });
+    }
 
     return purchaseData;
   });
@@ -143,7 +173,6 @@ const validatePayment = async (payload: { tran_id?: string }) => {
                 </button>
             </a>
         </p>
-
     </div>
     `
   );

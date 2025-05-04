@@ -19,18 +19,22 @@ const client_1 = require("@prisma/client");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
 const sendEmail_1 = __importDefault(require("./sendEmail"));
-const initPayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield prisma_1.default.user.findUnique({
         where: {
-            id: payload === null || payload === void 0 ? void 0 : payload.userId,
+            id: user === null || user === void 0 ? void 0 : user.id,
         },
     });
     if (!userData) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
     }
+    if ((userData === null || userData === void 0 ? void 0 : userData.status) === "BLOCKED") {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, `User is ${userData === null || userData === void 0 ? void 0 : userData.status}`);
+    }
     const contentData = yield prisma_1.default.content.findUnique({
         where: {
             id: payload === null || payload === void 0 ? void 0 : payload.contentId,
+            isAvailable: true,
         },
     });
     if (!contentData) {
@@ -107,14 +111,42 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
         if (!contentLinkData) {
             throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Content link not found!");
         }
-        const purchaseData = yield tx.userPurchaseContents.create({
-            data: {
-                userId: updatedPaymentData.userId,
-                contentId: updatedPaymentData.contentId,
-                movieLink: contentLinkData === null || contentLinkData === void 0 ? void 0 : contentLinkData.contentLink,
-                status: updatedPaymentData.purchaseStatus,
+        // Check if purchase record already exists
+        const existingPurchase = yield tx.userPurchaseContents.findUnique({
+            where: {
+                userId_contentId: {
+                    userId: updatedPaymentData.userId,
+                    contentId: updatedPaymentData.contentId,
+                },
             },
         });
+        let purchaseData;
+        if (existingPurchase) {
+            // Update existing purchase record
+            purchaseData = yield tx.userPurchaseContents.update({
+                where: {
+                    userId_contentId: {
+                        userId: updatedPaymentData.userId,
+                        contentId: updatedPaymentData.contentId,
+                    },
+                },
+                data: {
+                    movieLink: contentLinkData.contentLink,
+                    status: updatedPaymentData.purchaseStatus,
+                },
+            });
+        }
+        else {
+            // Create new purchase record
+            purchaseData = yield tx.userPurchaseContents.create({
+                data: {
+                    userId: updatedPaymentData.userId,
+                    contentId: updatedPaymentData.contentId,
+                    movieLink: contentLinkData.contentLink,
+                    status: updatedPaymentData.purchaseStatus,
+                },
+            });
+        }
         return purchaseData;
     }));
     const user = yield prisma_1.default.user.findUnique({
@@ -132,7 +164,6 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
                 </button>
             </a>
         </p>
-
     </div>
     `);
     return true;
