@@ -10,6 +10,7 @@ const CreateContentValidationSchema = zod_1.z.object({
         price: zod_1.z.number({ required_error: "Price is required" }),
         rentprice: zod_1.z.number({ required_error: "Rent Price is required" }),
         director: zod_1.z.string({ required_error: "Director is required" }),
+        contentBanner: zod_1.z.string({ required_error: "Content Banner is required" }),
         producer: zod_1.z.string({ required_error: "Producer is required" }),
         actor: zod_1.z.string({ required_error: "Actor is required" }),
         actress: zod_1.z.string({ required_error: "Actress is required" }),
@@ -37,6 +38,9 @@ const updateContentValidationSchema = zod_1.z.object({
             .string()
             .optional(),
         producer: zod_1.z
+            .string()
+            .optional(),
+        contentBanner: zod_1.z
             .string()
             .optional(),
         actor: zod_1.z
