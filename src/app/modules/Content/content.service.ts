@@ -95,17 +95,42 @@ const deleteSingleContentFromDB = async (id: string) => {
   });
 
   const result = await prisma.$transaction(async(tx)=> {
+    // First delete all comments associated with reviews of this content
+    await tx.comment.deleteMany({
+      where: {
+        review: {
+          contentId: id
+        }
+      }
+    });
+
+    // Then delete all reviews associated with this content
+    await tx.reviews.deleteMany({
+      where: {
+        contentId: id
+      }
+    });
+
+    // Delete all payments associated with this content
+    await tx.payment.deleteMany({
+      where: {
+        contentId: id
+      }
+    });
+
+    // Then delete the content link
     const linkinfo = await tx.contentLinks.delete({
       where: {
         contentId: id
       }
-    })
+    });
+
+    // Finally delete the content
     await tx.content.delete({
       where: {id: linkinfo.contentId}
-    })
-    
-  })
-  return result
+    });
+  });
+  return result;
 };
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {

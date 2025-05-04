@@ -90,11 +90,33 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
         },
     });
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // First delete all comments associated with reviews of this content
+        yield tx.comment.deleteMany({
+            where: {
+                review: {
+                    contentId: id
+                }
+            }
+        });
+        // Then delete all reviews associated with this content
+        yield tx.reviews.deleteMany({
+            where: {
+                contentId: id
+            }
+        });
+        // Delete all payments associated with this content
+        yield tx.payment.deleteMany({
+            where: {
+                contentId: id
+            }
+        });
+        // Then delete the content link
         const linkinfo = yield tx.contentLinks.delete({
             where: {
                 contentId: id
             }
         });
+        // Finally delete the content
         yield tx.content.delete({
             where: { id: linkinfo.contentId }
         });
