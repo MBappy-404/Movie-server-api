@@ -180,7 +180,7 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
   <p>Best regards,<br/>The CineVerse Team</p>
 </div>
     `);
-    return true;
+    return isPaymentExist;
 });
 const getAllPayment = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.payment.findMany({

@@ -7,17 +7,12 @@ const router = express.Router();
 
 router.post(
   "/init-payment",
-  auth(UserRole.USER),
+  auth(UserRole.USER, UserRole.ADMIN),
   PaymentController.initPayment
 );
 router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
 
-router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
-
-router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
-
-router.get("/my-purchase-history", auth(UserRole.USER, UserRole.ADMIN), PaymentController.getAllPayment);
-
+router.get("/my-purchase-history", auth(UserRole.USER, UserRole.ADMIN), PaymentController.MyPurchagesHistory);
 
 router.post("/ipn", PaymentController.validatePayment);
 

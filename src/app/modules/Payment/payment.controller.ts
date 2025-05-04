@@ -38,7 +38,7 @@ const MyPurchagesHistory = catchAsync(async (req, res) => {
 const validatePayment = catchAsync(async (req, res) => {
   const result = await PaymentService.validatePayment(req.query);
   if (result) {
-    res.redirect(`${config.ssl.success_url}/success`);
+    res.redirect(`${config.ssl.success_url}/success?tran_id=${result.transactionId}`);
   } else {
     res.redirect(`${config.ssl.failed_url}/failed`);
   }

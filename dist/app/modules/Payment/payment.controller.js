@@ -48,7 +48,7 @@ const MyPurchagesHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(
 const validatePayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield payment_service_1.PaymentService.validatePayment(req.query);
     if (result) {
-        res.redirect(`${config_1.default.ssl.success_url}/success`);
+        res.redirect(`${config_1.default.ssl.success_url}/success?tran_id=${result.transactionId}`);
     }
     else {
         res.redirect(`${config_1.default.ssl.failed_url}/failed`);

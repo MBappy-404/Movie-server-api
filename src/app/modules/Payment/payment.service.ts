@@ -151,7 +151,6 @@ const validatePayment = async (payload: { tran_id?: string }) => {
         },
       });
     }
-
     return purchaseData;
   });
 
@@ -191,7 +190,7 @@ const validatePayment = async (payload: { tran_id?: string }) => {
     `
   );
 
-  return true;
+  return isPaymentExist;
 };
 
 
