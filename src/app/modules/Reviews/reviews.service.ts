@@ -72,10 +72,29 @@ const updateReview = async (id: string, payload: Reviews) => {
 };
 
 const deleteReview = async (id: string) => {
-  const result = await prisma.reviews.delete({
-    where: {
-      id,
-    },
+  const result = await prisma.$transaction(async (tx) => {
+    // First delete all comments associated with this review
+    await tx.comment.deleteMany({
+      where: {
+        reviewId: id
+      }
+    });
+
+    // Then delete all likes associated with this review
+    await tx.like.deleteMany({
+      where: {
+        reviewId: id
+      }
+    });
+
+    // Finally delete the review
+    const deletedReview = await tx.reviews.delete({
+      where: {
+        id,
+      },
+    });
+
+    return deletedReview;
   });
   return result;
 };

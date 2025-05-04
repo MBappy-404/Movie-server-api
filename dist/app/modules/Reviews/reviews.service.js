@@ -71,11 +71,27 @@ const updateReview = (id, payload) => __awaiter(void 0, void 0, void 0, function
     return result;
 });
 const deleteReview = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.reviews.delete({
-        where: {
-            id,
-        },
-    });
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // First delete all comments associated with this review
+        yield tx.comment.deleteMany({
+            where: {
+                reviewId: id
+            }
+        });
+        // Then delete all likes associated with this review
+        yield tx.like.deleteMany({
+            where: {
+                reviewId: id
+            }
+        });
+        // Finally delete the review
+        const deletedReview = yield tx.reviews.delete({
+            where: {
+                id,
+            },
+        });
+        return deletedReview;
+    }));
     return result;
 });
 const getReviewStats = () => __awaiter(void 0, void 0, void 0, function* () {
