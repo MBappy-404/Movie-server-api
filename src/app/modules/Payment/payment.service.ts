@@ -69,7 +69,7 @@ const initPayment = async (payload: IUserPurchaseContents) => {
 
   const result = await SSLService.initPayment(initPaymentData);
   return {
-    paymentUrl: result.GatewayPageURL,
+    paymentUrl: result,
   };
 };
 
@@ -143,7 +143,7 @@ const validatePayment = async (payload: { tran_id?: string }) => {
     `
   );
 
-  return result;
+  return true;
 };
 
 export const PaymentService = {

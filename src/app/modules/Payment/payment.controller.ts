@@ -1,3 +1,4 @@
+import config from "../../config";
 import { catchAsync } from "../../helper/catchAsync";
 import sendResponse from "../../helper/sendResponse";
 import { PaymentService } from "./payment.service";
@@ -15,12 +16,11 @@ const initPayment = catchAsync(async (req, res) => {
 
 const validatePayment = catchAsync(async (req, res) => {
   const result = await PaymentService.validatePayment(req.query);
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: "Payment validate successfully",
-    data: result,
-  });
+  if (result) {
+    res.redirect(`${config.ssl.success_url}/success`);
+  } else {
+    res.redirect(`${config.ssl.failed_url}/failed`);
+  }
 });
 
 export const PaymentController = {
