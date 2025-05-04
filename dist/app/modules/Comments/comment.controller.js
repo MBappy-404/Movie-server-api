@@ -68,10 +68,22 @@ const getSingleComment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(vo
         meta: result.meta
     });
 }));
+const getCommentsByParentId = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { parentId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    const result = yield comment_service_1.CommentServices.getCommentsByParentId(parentId, Number(page), Number(limit));
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Comments fetched successfully",
+        data: result
+    });
+}));
 exports.CommentController = {
     addComment,
     getAllComments,
     updateComment,
     deleteComment,
     getSingleComment,
+    getCommentsByParentId
 };

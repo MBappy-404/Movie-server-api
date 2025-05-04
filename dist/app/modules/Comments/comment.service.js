@@ -98,10 +98,63 @@ const getSingleComment = (id_1, ...args_1) => __awaiter(void 0, [id_1, ...args_1
         }
     };
 });
+const getCommentsByParentId = (parentId_1, ...args_1) => __awaiter(void 0, [parentId_1, ...args_1], void 0, function* (parentId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const [comments, total] = yield Promise.all([
+        prisma_1.default.comment.findMany({
+            where: {
+                parentId: parentId,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        profilePhoto: true
+                    }
+                },
+                replies: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                profilePhoto: true
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                }
+            },
+            skip,
+            take: limit,
+            orderBy: {
+                createdAt: 'desc'
+            }
+        }),
+        prisma_1.default.comment.count({
+            where: {
+                parentId: parentId,
+            }
+        })
+    ]);
+    return {
+        data: comments,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
+});
 exports.CommentServices = {
     addComment,
     getAllComments,
     updateComment,
     deleteComment,
     getSingleComment,
+    getCommentsByParentId
 };

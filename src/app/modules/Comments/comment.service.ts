@@ -100,10 +100,66 @@ const getSingleComment = async (id: string, page: number = 1, limit: number = 5)
   };
 };
 
+const getCommentsByParentId = async (parentId: string, page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+
+  const [comments, total] = await Promise.all([
+    prisma.comment.findMany({
+      where: {
+        parentId: parentId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profilePhoto: true
+          }
+        },
+        replies: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                profilePhoto: true
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    }),
+    prisma.comment.count({
+      where: {
+        parentId: parentId,
+      }
+    })
+  ]);
+
+  return {
+    data: comments,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  };
+};
+
 export const CommentServices = {
   addComment,
   getAllComments,
   updateComment,
   deleteComment,
   getSingleComment,
+  getCommentsByParentId
 };

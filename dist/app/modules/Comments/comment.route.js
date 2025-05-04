@@ -14,4 +14,5 @@ router.get("/", comment_controller_1.CommentController.getAllComments);
 router.get("/nested/:id", comment_controller_1.CommentController.getSingleComment);
 router.patch("/:id", comment_controller_1.CommentController.updateComment);
 router.delete("/:id", comment_controller_1.CommentController.deleteComment);
+router.get("/parent/:parentId", comment_controller_1.CommentController.getCommentsByParentId);
 exports.CommentRoutes = router;

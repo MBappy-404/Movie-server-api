@@ -58,10 +58,29 @@ const getSingleComment = catchAsync(async (req, res) => {
   });
 });
 
+const getCommentsByParentId = catchAsync(async (req, res) => {
+  const { parentId } = req.params;
+  const { page = 1, limit = 10 } = req.query;
+  
+  const result = await CommentServices.getCommentsByParentId(
+    parentId,
+    Number(page),
+    Number(limit)
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Comments fetched successfully",
+    data: result
+  });
+});
+
 export const CommentController = {
   addComment,
   getAllComments,
   updateComment,
   deleteComment,
   getSingleComment,
+  getCommentsByParentId
 };

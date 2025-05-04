@@ -21,4 +21,9 @@ router.patch(
 );
 router.delete("/:id", CommentController.deleteComment);
 
+router.get(
+  "/parent/:parentId",
+  CommentController.getCommentsByParentId
+);
+
 export const CommentRoutes = router;
