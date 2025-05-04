@@ -14,6 +14,27 @@ const initPayment = catchAsync(async (req, res) => {
   });
 });
 
+const getAllPayment = catchAsync(async (req, res) => {
+  const result = await PaymentService.getAllPayment();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Payment fetched successfully",
+    data: result,
+  });
+});
+
+
+const MyPurchagesHistory = catchAsync(async (req, res) => {
+  const result = await PaymentService.getMyPurchagesHistory(req.user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "My Payment fetched successfully",
+    data: result,
+  });
+});
+
 const validatePayment = catchAsync(async (req, res) => {
   const result = await PaymentService.validatePayment(req.query);
   if (result) {
@@ -26,4 +47,6 @@ const validatePayment = catchAsync(async (req, res) => {
 export const PaymentController = {
   initPayment,
   validatePayment,
+  getAllPayment,
+  MyPurchagesHistory
 };

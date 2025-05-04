@@ -10,7 +10,13 @@ router.post(
   auth(UserRole.USER),
   PaymentController.initPayment
 );
+router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
 
+router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
+
+router.get("/", auth(UserRole.ADMIN), PaymentController.getAllPayment);
+
+router.get("/my-purchase-history", auth(UserRole.USER, UserRole.ADMIN), PaymentController.getAllPayment);
 
 
 router.post("/ipn", PaymentController.validatePayment);

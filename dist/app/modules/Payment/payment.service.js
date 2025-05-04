@@ -182,7 +182,31 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
     `);
     return true;
 });
+const getAllPayment = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.payment.findMany({
+        include: {
+            user: true,
+            content: true,
+        },
+        orderBy: { createdAt: "desc" },
+    });
+    return result;
+});
+const getMyPurchagesHistory = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.payment.findMany({
+        where: {
+            userId: user.id
+        },
+        include: {
+            user: true,
+            content: true,
+        },
+    });
+    return result;
+});
 exports.PaymentService = {
     initPayment,
     validatePayment,
+    getAllPayment,
+    getMyPurchagesHistory
 };

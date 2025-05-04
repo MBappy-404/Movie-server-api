@@ -194,7 +194,34 @@ const validatePayment = async (payload: { tran_id?: string }) => {
   return true;
 };
 
+
+const getAllPayment = async () => {
+  const result = await prisma.payment.findMany({
+    include: {
+      user: true,
+      content: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  return result;
+};
+
+const getMyPurchagesHistory = async (user: any) => {
+  const result = await prisma.payment.findMany({
+    where: {
+      userId: user.id
+    },
+    include: {
+      user: true,
+      content: true,
+    },
+  });
+  return result;
+};
+
 export const PaymentService = {
   initPayment,
   validatePayment,
+  getAllPayment,
+  getMyPurchagesHistory
 };

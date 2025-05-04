@@ -27,6 +27,24 @@ const initPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const getAllPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield payment_service_1.PaymentService.getAllPayment();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Payment fetched successfully",
+        data: result,
+    });
+}));
+const MyPurchagesHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield payment_service_1.PaymentService.getMyPurchagesHistory(req.user);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "My Payment fetched successfully",
+        data: result,
+    });
+}));
 const validatePayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield payment_service_1.PaymentService.validatePayment(req.query);
     if (result) {
@@ -39,4 +57,6 @@ const validatePayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
 exports.PaymentController = {
     initPayment,
     validatePayment,
+    getAllPayment,
+    MyPurchagesHistory
 };
