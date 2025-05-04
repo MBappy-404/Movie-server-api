@@ -36,6 +36,8 @@ const addReviews = (payload) => __awaiter(void 0, void 0, void 0, function* () {
 const getAllReviews = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.reviews.findMany({
         include: {
+            user: true,
+            content: true,
             comment: true,
             like: true,
         },

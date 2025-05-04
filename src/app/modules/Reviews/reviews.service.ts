@@ -31,6 +31,8 @@ const addReviews = async (payload: Reviews) => {
 const getAllReviews = async () => {
   const result = await prisma.reviews.findMany({
     include:{
+      user: true,
+      content: true,
       comment:true,
       like:true,
     },

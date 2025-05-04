@@ -29,7 +29,7 @@ const addReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
 const getAllReviews = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield reviews_service_1.ReviewsService.getAllReviews();
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.FOUND,
+        statusCode: http_status_1.default.OK,
         success: true,
         message: "Reviews fetched successfully",
         data: result,
@@ -49,7 +49,7 @@ const updateReview = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
     const { id } = req.params;
     const result = yield reviews_service_1.ReviewsService.updateReview(id, req.body);
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.FOUND,
+        statusCode: http_status_1.default.OK,
         success: true,
         message: " Review updated successfully",
         data: result,

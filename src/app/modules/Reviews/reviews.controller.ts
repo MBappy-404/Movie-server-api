@@ -15,7 +15,7 @@ const addReviews = catchAsync(async (req, res) => {
 const getAllReviews = catchAsync(async (req, res) => {
   const result = await ReviewsService.getAllReviews();
   sendResponse(res, {
-    statusCode: httpStatus.FOUND,
+    statusCode: httpStatus.OK,
     success: true,
     message: "Reviews fetched successfully",
     data: result,
@@ -36,7 +36,7 @@ const updateReview = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await ReviewsService.updateReview(id, req.body);
   sendResponse(res, {
-    statusCode: httpStatus.FOUND,
+    statusCode: httpStatus.OK,
     success: true,
     message: " Review updated successfully",
     data: result,
