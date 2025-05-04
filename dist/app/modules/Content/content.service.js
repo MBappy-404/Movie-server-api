@@ -110,6 +110,12 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
                 contentId: id
             }
         });
+        // Delete all user purchase contents associated with this content
+        yield tx.userPurchaseContents.deleteMany({
+            where: {
+                contentId: id
+            }
+        });
         // Then delete the content link
         const linkinfo = yield tx.contentLinks.delete({
             where: {

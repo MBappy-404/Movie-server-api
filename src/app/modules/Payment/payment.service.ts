@@ -164,16 +164,30 @@ const validatePayment = async (payload: { tran_id?: string }) => {
   await emailSender(
     user?.email as string,
     `
-    <div>
-        <p>Dear ${user?.name},</p> </br>
-        <p>Here is your Movie 
-            <a href=${result.movieLink}>
-                <button>
-                    Watch Movie
-                </button>
-            </a>
-        </p>
-    </div>
+    <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+  <p>Dear ${user?.name},</p>
+
+  <p>Thank you for choosing our service! Your movie is ready to watch:</p>
+
+  <p>
+    <a href="${result.movieLink}" style="text-decoration: none;">
+      <button style="
+        background-color: #1e90ff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      ">
+        Watch Movie
+      </button>
+    </a>
+  </p>
+
+  <p>Enjoy your movie!</p>
+  <p>Best regards,<br/>The CineVerse Team</p>
+</div>
     `
   );
 

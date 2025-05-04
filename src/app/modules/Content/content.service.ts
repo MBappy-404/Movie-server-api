@@ -118,6 +118,13 @@ const deleteSingleContentFromDB = async (id: string) => {
       }
     });
 
+    // Delete all user purchase contents associated with this content
+    await tx.userPurchaseContents.deleteMany({
+      where: {
+        contentId: id
+      }
+    });
+
     // Then delete the content link
     const linkinfo = await tx.contentLinks.delete({
       where: {
