@@ -60,6 +60,7 @@ model Content {
   price                Float
   rentprice            Float
   director             String
+  contentBanner        String
   producer             String
   actor                String
   actress              String

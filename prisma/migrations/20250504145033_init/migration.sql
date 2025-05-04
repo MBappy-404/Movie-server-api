@@ -66,6 +66,7 @@ CREATE TABLE "contents" (
     "price" DOUBLE PRECISION NOT NULL,
     "rentprice" DOUBLE PRECISION NOT NULL,
     "director" TEXT NOT NULL,
+    "contentBanner" TEXT NOT NULL,
     "producer" TEXT NOT NULL,
     "actor" TEXT NOT NULL,
     "actress" TEXT NOT NULL,
