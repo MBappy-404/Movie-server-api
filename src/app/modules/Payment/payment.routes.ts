@@ -11,6 +11,6 @@ router.post(
   PaymentController.initPayment
 );
 
-router.post("/ipn", auth(UserRole.USER), PaymentController.validatePayment);
+router.post("/ipn", PaymentController.validatePayment);
 
 export const PaymentRoutes = router;

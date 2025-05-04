@@ -5,7 +5,7 @@ import { PaymentService } from "./payment.service";
 import httpStatus from "http-status";
 
 const initPayment = catchAsync(async (req, res) => {
-  const result = await PaymentService.initPayment(req.body);
+  const result = await PaymentService.initPayment(req.body, req.user);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

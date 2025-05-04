@@ -6,12 +6,13 @@ import httpStatus from "http-status";
 import { IUserPurchaseContents } from "../UserPurchaseContents/userPurchaseContents.interface";
 import emailSender from "./sendEmail";
 
-const initPayment = async (payload: IUserPurchaseContents) => {
+const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   const userData = await prisma.user.findUnique({
     where: {
-      id: payload?.userId,
+      id: user.id,
     },
   });
+
 
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found!");
@@ -20,6 +21,7 @@ const initPayment = async (payload: IUserPurchaseContents) => {
   const contentData = await prisma.content.findUnique({
     where: {
       id: payload?.contentId,
+      isAvailable: true,
     },
   });
 
