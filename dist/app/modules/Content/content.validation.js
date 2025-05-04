@@ -61,6 +61,9 @@ const updateContentValidationSchema = zod_1.z.object({
         genreId: zod_1.z
             .string()
             .optional(),
+        isAvailable: zod_1.z
+            .boolean()
+            .optional(),
     }),
     contentLink: zod_1.z
         .string()

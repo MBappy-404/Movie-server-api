@@ -8,6 +8,7 @@ const CreateContentValidationSchema = z.object({
     price: z.number({ required_error: "Price is required" }),
     rentprice: z.number({ required_error: "Rent Price is required" }),
     director: z.string({ required_error: "Director is required" }),
+    
     contentBanner: z.string({ required_error: "Content Banner is required" }),
     producer: z.string({ required_error: "Producer is required" }),
     actor: z.string({ required_error: "Actor is required" }),
@@ -59,6 +60,9 @@ const updateContentValidationSchema = z.object({
       .optional(),
     genreId: z
       .string()
+      .optional(),
+    isAvailable: z
+      .boolean()
       .optional(),
   }),
   contentLink: z
