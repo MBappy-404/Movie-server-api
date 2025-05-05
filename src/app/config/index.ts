@@ -29,4 +29,6 @@ export default {
     email: process.env.SENDER_EMAIL,
     app_pass: process.env.SENDER_APP_PASS,
   },
+
+  node_env: process.env.PRODUCTION 
 };

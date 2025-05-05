@@ -2,13 +2,14 @@ import httpStatus from 'http-status'
 import { catchAsync } from '../../helper/catchAsync'
 import { AuthService } from './auth.service'
 import sendResponse from '../../helper/sendResponse'
+import config from '../../config'
 
 const LoginUser = catchAsync(async(req, res)=> {
     const result = await AuthService.loginUserIntoDB(req.body)
     const {accessToken, refreshToken} = result
 
     res.cookie("refreshToken", refreshToken, {
-        secure: false,
+        secure: config.node_env === "production",
         httpOnly: true
     })
     

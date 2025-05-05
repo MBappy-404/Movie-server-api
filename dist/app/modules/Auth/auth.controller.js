@@ -17,11 +17,12 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = require("../../helper/catchAsync");
 const auth_service_1 = require("./auth.service");
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
+const config_1 = __importDefault(require("../../config"));
 const LoginUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthService.loginUserIntoDB(req.body);
     const { accessToken, refreshToken } = result;
     res.cookie("refreshToken", refreshToken, {
-        secure: false,
+        secure: config_1.default.node_env === "production",
         httpOnly: true
     });
     (0, sendResponse_1.default)(res, {
