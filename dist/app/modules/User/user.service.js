@@ -173,9 +173,33 @@ const deleteUserIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () 
     yield prisma_1.default.user.findUniqueOrThrow({
         where: { id }
     });
-    const result = yield prisma_1.default.user.delete({
-        where: { id }
-    });
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // Delete all comments by the user
+        yield tx.comment.deleteMany({
+            where: { userId: id }
+        });
+        // Delete all likes by the user
+        yield tx.like.deleteMany({
+            where: { userId: id }
+        });
+        // Delete all reviews by the user
+        yield tx.reviews.deleteMany({
+            where: { userId: id }
+        });
+        // Delete all payments by the user
+        yield tx.payment.deleteMany({
+            where: { userId: id }
+        });
+        // Delete all user purchase contents
+        yield tx.userPurchaseContents.deleteMany({
+            where: { userId: id }
+        });
+        // Finally delete the user
+        const deletedUser = yield tx.user.delete({
+            where: { id }
+        });
+        return deletedUser;
+    }));
     return result;
 });
 const updateUserIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {

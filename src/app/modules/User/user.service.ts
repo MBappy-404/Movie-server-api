@@ -132,12 +132,43 @@ const getUserByIdIntoDB = async (id: string) => {
 const deleteUserIntoDB = async (id: string) => {
     await prisma.user.findUniqueOrThrow({
         where: { id }
-    })
+    });
 
-    const result = await prisma.user.delete({
-        where: { id }
-    })
-    return result
+    const result = await prisma.$transaction(async (tx) => {
+        // Delete all comments by the user
+        await tx.comment.deleteMany({
+            where: { userId: id }
+        });
+
+        // Delete all likes by the user
+        await tx.like.deleteMany({
+            where: { userId: id }
+        });
+
+        // Delete all reviews by the user
+        await tx.reviews.deleteMany({
+            where: { userId: id }
+        });
+
+        // Delete all payments by the user
+        await tx.payment.deleteMany({
+            where: { userId: id }
+        });
+
+        // Delete all user purchase contents
+        await tx.userPurchaseContents.deleteMany({
+            where: { userId: id }
+        });
+
+        // Finally delete the user
+        const deletedUser = await tx.user.delete({
+            where: { id }
+        });
+
+        return deletedUser;
+    });
+
+    return result;
 }
 
 const updateUserIntoDB = async (req: any) => {
