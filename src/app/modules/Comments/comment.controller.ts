@@ -52,7 +52,7 @@ const getSingleComment = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Comments fetched successfully",
+    message: "Comments fetched successfully!",
     data: result.data,
     meta: result.meta
   });
