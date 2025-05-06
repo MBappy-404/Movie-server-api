@@ -18,11 +18,20 @@ const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const like_service_1 = require("./like.service");
 const addLike = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield like_service_1.LikeServices.addLike(req.body);
+    const result = yield like_service_1.LikeServices.addLike(req.body, req.user);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
         message: "Like added successfully",
+        data: result,
+    });
+}));
+const GetLikesDislikesByReviewId = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield like_service_1.LikeServices.getLikeDislikeCounts(req);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Like dislike fetch successfully",
         data: result,
     });
 }));
@@ -39,4 +48,5 @@ const updateLike = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
 exports.LikeController = {
     addLike,
     updateLike,
+    GetLikesDislikesByReviewId
 };

@@ -5,7 +5,7 @@ import { LikeServices } from "./like.service";
  
 
 const addLike = catchAsync(async (req, res) => {
-  const result = await LikeServices.addLike(req.body);
+  const result = await LikeServices.addLike(req.body, req.user);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -14,6 +14,17 @@ const addLike = catchAsync(async (req, res) => {
   });
 });
  
+const GetLikesDislikesByReviewId = catchAsync(async(req, res)=> {
+
+  const result = await LikeServices.getLikeDislikeCounts(req);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Like dislike fetch successfully",
+    data: result,
+  });
+
+})
 
 const updateLike = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -29,5 +40,5 @@ const updateLike = catchAsync(async (req, res) => {
 export const LikeController = {
    addLike,
    updateLike,
-  
+   GetLikesDislikesByReviewId
 };

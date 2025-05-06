@@ -5,13 +5,14 @@ import AppError from "../../errors/AppError";
 import prisma from "../../helper/prisma";
 
 
-const addLike = async (payload: any) => {
-  const { userId, reviewId, status } = payload;
+const addLike = async (payload: any, user: any) => {
+
+  const { reviewId, status } = payload;
 
   // Check if the user already liked/disliked this review
   const existing = await prisma.like.findFirst({
     where: {
-      userId,
+      userId: user.id,
       reviewId,
     },
   });
@@ -39,7 +40,7 @@ const addLike = async (payload: any) => {
     // New like or dislike
     await prisma.like.create({
       data: {
-        userId,
+        userId: user.id,
         reviewId,
         status,
       },
@@ -61,12 +62,36 @@ const addLike = async (payload: any) => {
     },
   });
 
+
+
+
   // Return updated counts
   return {
     reviewId,
     likeCount: likes,
     dislikeCount: dislikes,
   };
+};
+
+const getLikeDislikeCounts = async (req: any) => {
+
+  const { reviewId } = req.params
+
+  const likes = await prisma.like.count({
+    where: {
+      reviewId,
+      status: 'LIKED',
+    },
+  });
+
+  const dislikes = await prisma.like.count({
+    where: {
+      reviewId,
+      status: 'DISLIKED',
+    },
+  });
+
+  return { likes, dislikes };
 };
 
 // const addLike = async (payload: Like) => {
@@ -91,7 +116,7 @@ const addLike = async (payload: any) => {
 //     where:{
 //       reviewId: payload.reviewId,
 //       userId: payload.userId,
-      
+
 //     }
 //   }) 
 
@@ -119,25 +144,10 @@ const updateLike = async (id: string, payload: Like) => {
   return result;
 };
 
-const getLikeDislikeCounts = async (reviewId: string) => {
-  const likes = await prisma.like.count({
-    where: {
-      reviewId,
-      status: 'LIKED',
-    },
-  });
 
-  const dislikes = await prisma.like.count({
-    where: {
-      reviewId,
-      status: 'DISLIKED',
-    },
-  });
-
-  return { likes, dislikes };
-};
 
 export const LikeServices = {
   addLike,
   updateLike,
+  getLikeDislikeCounts
 };

@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LikeServices = void 0;
 const prisma_1 = __importDefault(require("../../helper/prisma"));
-const addLike = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, reviewId, status } = payload;
+const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const { reviewId, status } = payload;
     // Check if the user already liked/disliked this review
     const existing = yield prisma_1.default.like.findFirst({
         where: {
-            userId,
+            userId: user.id,
             reviewId,
         },
     });
@@ -48,7 +48,7 @@ const addLike = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         // New like or dislike
         yield prisma_1.default.like.create({
             data: {
-                userId,
+                userId: user.id,
                 reviewId,
                 status,
             },
@@ -73,6 +73,22 @@ const addLike = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         likeCount: likes,
         dislikeCount: dislikes,
     };
+});
+const getLikeDislikeCounts = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const { reviewId } = req.params;
+    const likes = yield prisma_1.default.like.count({
+        where: {
+            reviewId,
+            status: 'LIKED',
+        },
+    });
+    const dislikes = yield prisma_1.default.like.count({
+        where: {
+            reviewId,
+            status: 'DISLIKED',
+        },
+    });
+    return { likes, dislikes };
 });
 // const addLike = async (payload: Like) => {
 //   const isUserExist = await prisma.user.findUnique({
@@ -115,22 +131,8 @@ const updateLike = (id, payload) => __awaiter(void 0, void 0, void 0, function* 
     });
     return result;
 });
-const getLikeDislikeCounts = (reviewId) => __awaiter(void 0, void 0, void 0, function* () {
-    const likes = yield prisma_1.default.like.count({
-        where: {
-            reviewId,
-            status: 'LIKED',
-        },
-    });
-    const dislikes = yield prisma_1.default.like.count({
-        where: {
-            reviewId,
-            status: 'DISLIKED',
-        },
-    });
-    return { likes, dislikes };
-});
 exports.LikeServices = {
     addLike,
     updateLike,
+    getLikeDislikeCounts
 };
