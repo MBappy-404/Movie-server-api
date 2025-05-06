@@ -36,7 +36,7 @@ app.use((req: Request, res: Response, next: NextFunction)=>{
     message: "Api Not Found",
     error:{
       path: req.originalUrl,
-      message: "Your request path is not found"
+      message: "Your request path is not found!"
     }
   })
 })
