@@ -55,14 +55,14 @@ const generateToken_1 = __importDefault(require("../../utils/generateToken"));
 const config_1 = __importDefault(require("../../config"));
 const verifyToken_1 = __importDefault(require("../../utils/verifyToken"));
 const loginUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const userData = yield prisma_1.default.user.findFirstOrThrow({
+    const userData = yield prisma_1.default.user.findUnique({
         where: {
             email: payload.email,
             status: client_1.UserStatus.ACTIVE
         }
     });
-    if ((userData === null || userData === void 0 ? void 0 : userData.status) === "BLOCKED") {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already is blocked");
+    if (!userData) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
     }
     const incorrectPassword = yield bcrypt.compare(payload.password, userData === null || userData === void 0 ? void 0 : userData.password);
     if (!incorrectPassword) {

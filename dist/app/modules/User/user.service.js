@@ -57,7 +57,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserServices = void 0;
-const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const paginationHelper_1 = require("../../helper/paginationHelper");
 const prisma_1 = __importDefault(require("../../helper/prisma"));
@@ -207,7 +206,7 @@ const updateUserIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* ()
     const file = req.file;
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const verifyUser = yield tx.user.findUniqueOrThrow({
-            where: { id, status: client_1.UserStatus.ACTIVE }
+            where: { id }
         });
         if (file) {
             const uploadData = yield fileUploader_1.FileUploader.uploadToCloudinary(file);

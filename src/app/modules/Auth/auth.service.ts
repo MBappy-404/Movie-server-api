@@ -8,18 +8,19 @@ import config from "../../config"
 import { Secret } from "jsonwebtoken"
 import verifyToken from "../../utils/verifyToken"
 import { IResetPassword } from "./auth.interface"
+import { IUser } from "../User/user.interface"
 
 
 const loginUserIntoDB = async (payload: any) => {
-    const userData = await prisma.user.findFirstOrThrow({
+    const userData = await prisma.user.findUnique({
         where: {
             email: payload.email,
             status: UserStatus.ACTIVE
         }
     })
     
-    if(userData?.status === "BLOCKED"){
-        throw new AppError(httpStatus.BAD_REQUEST, "User already is blocked")
+    if (!userData) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found")
     }
     
     const incorrectPassword = await bcrypt.compare(payload.password, userData?.password as string)
@@ -41,7 +42,6 @@ const loginUserIntoDB = async (payload: any) => {
         accessToken,
         refreshToken
     }
-
 }
 
 const refreshTokenIntoDB = async (token: string) => {

@@ -179,7 +179,7 @@ const updateUserIntoDB = async (req: any) => {
 
     const result = await prisma.$transaction(async (tx) => {
         const verifyUser = await tx.user.findUniqueOrThrow({
-            where: { id, status: UserStatus.ACTIVE }
+            where: { id }
         })
 
         if (file) {

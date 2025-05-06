@@ -1,3 +1,4 @@
+import { UserStatus } from "@prisma/client";
 import z from "zod";
 
 
@@ -14,6 +15,7 @@ const updateUserValidation = z.object({
     email: z.string().optional(),
     contactNumber: z.string().optional(),
     role: z.string().optional(),
+    status: z.enum([UserStatus.ACTIVE, UserStatus.BLOCKED, UserStatus.DELETED]).optional()
 })
 
 export const UserValidation = {
