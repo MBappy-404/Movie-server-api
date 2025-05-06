@@ -131,8 +131,6 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
 });
 const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const allcontent = yield prisma_1.default.content.findMany();
-    return allcontent;
     const { page, limit, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm, genre, platform } = params, filterData = __rest(params, ["searchTerm", "genre", "platform"]);
     const andCondition = [];

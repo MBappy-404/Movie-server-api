@@ -141,9 +141,6 @@ const deleteSingleContentFromDB = async (id: string) => {
 };
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
-
-  const allcontent  =await prisma.content.findMany();
-  return allcontent
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, genre, platform, ...filterData } = params;
 
