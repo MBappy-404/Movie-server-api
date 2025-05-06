@@ -5,7 +5,7 @@ import { UserRole } from '@prisma/client'
 
 const router = express.Router()
 
-router.patch('/:userId/block', AdminController.AdminBlockUser)
+router.patch('/:userId/block', auth(UserRole.ADMIN), AdminController.AdminBlockUser)
 router.get('/dashboard-stats', auth(UserRole.ADMIN) ,AdminController.getAdminDashboardStats)
 
 

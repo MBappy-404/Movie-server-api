@@ -9,6 +9,6 @@ const admin_controller_1 = require("./admin.controller");
 const auth_1 = __importDefault(require("../../middleware/auth"));
 const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
-router.patch('/:userId/block', admin_controller_1.AdminController.AdminBlockUser);
+router.patch('/:userId/block', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.AdminBlockUser);
 router.get('/dashboard-stats', (0, auth_1.default)(client_1.UserRole.ADMIN), admin_controller_1.AdminController.getAdminDashboardStats);
 exports.AdminRoutes = router;

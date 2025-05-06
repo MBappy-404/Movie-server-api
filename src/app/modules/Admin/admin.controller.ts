@@ -4,8 +4,7 @@ import sendResponse from "../../helper/sendResponse";
 import { AdminService } from "./admin.service";
 
 const AdminBlockUser = catchAsync(async (req, res) => {
-  const { userId }: any = req.params;
-  await AdminService.UserBlockIntoDB(userId);
+  await AdminService.UserBlockIntoDB(req.user);
   sendResponse(res, {
     success: true,
     message: "User blocked successfully",

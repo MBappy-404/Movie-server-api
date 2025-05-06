@@ -18,8 +18,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../helper/sendResponse"));
 const admin_service_1 = require("./admin.service");
 const AdminBlockUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
-    yield admin_service_1.AdminService.UserBlockIntoDB(userId);
+    yield admin_service_1.AdminService.UserBlockIntoDB(req.user);
     (0, sendResponse_1.default)(res, {
         success: true,
         message: "User blocked successfully",

@@ -17,19 +17,22 @@ const client_1 = require("@prisma/client");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const prisma_1 = __importDefault(require("../../helper/prisma"));
 const http_status_1 = __importDefault(require("http-status"));
-const UserBlockIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.default.user.findFirstOrThrow({
-        where: { id },
+const UserBlockIntoDB = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    const verifyuser = yield prisma_1.default.user.findFirst({
+        where: { id: user.id, status: client_1.UserStatus.ACTIVE },
     });
+    if (!verifyuser) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User Not Found");
+    }
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const verifydata = yield transactionClient.user.findFirst({
-            where: { id },
+            where: { id: user.id },
         });
         if ((verifydata === null || verifydata === void 0 ? void 0 : verifydata.status) === "BLOCKED") {
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already blocked");
         }
         yield transactionClient.user.update({
-            where: { id },
+            where: { id: user.id },
             data: {
                 status: client_1.UserStatus.BLOCKED,
             },
