@@ -16,4 +16,11 @@ router.get("/verify-payment", auth(UserRole.USER, UserRole.ADMIN), PaymentContro
 
 router.post("/ipn", PaymentController.validatePayment);
 
+// Add route to remove unpaid payment
+router.delete(
+  "/remove-unpaid/:paymentId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  PaymentController.removeUnpaidPayment
+);
+
 export const PaymentRoutes = router;

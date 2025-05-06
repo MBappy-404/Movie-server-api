@@ -111,6 +111,26 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         },
     };
 });
+const removeUnpaidPayment = (paymentId) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield prisma_1.default.payment.findUnique({
+        where: {
+            id: paymentId,
+        },
+    });
+    if (!payment) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Payment not found!");
+    }
+    if (payment.status === client_1.PaymentStatus.PAID) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Cannot remove paid payment!");
+    }
+    // Delete the payment record
+    yield prisma_1.default.payment.delete({
+        where: {
+            id: paymentId,
+        },
+    });
+    return {};
+});
 const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!payload.tran_id) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Transaction id not found!");
@@ -122,6 +142,16 @@ const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function*
     });
     if (!isPaymentExist) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Payment not found!");
+    }
+    // Check if payment is unpaid and older than 24 hours
+    if (isPaymentExist.status === client_1.PaymentStatus.UNPAID) {
+        const paymentAge = Date.now() - isPaymentExist.createdAt.getTime();
+        const hoursOld = paymentAge / (1000 * 60 * 60);
+        if (hoursOld >= 24) {
+            // Remove unpaid payment if it's older than 24 hours
+            yield removeUnpaidPayment(isPaymentExist.id);
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Payment expired. Please try purchasing again.");
+        }
     }
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const updatedPaymentData = yield tx.payment.update({
@@ -238,5 +268,6 @@ exports.PaymentService = {
     initPayment,
     validatePayment,
     getAllPayment,
-    getVerifyPayment
+    getVerifyPayment,
+    removeUnpaidPayment,
 };

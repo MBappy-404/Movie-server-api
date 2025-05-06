@@ -113,6 +113,31 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   };
 };
 
+const removeUnpaidPayment = async (paymentId: string) => {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+  });
+
+  if (!payment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Payment not found!");
+  }
+
+  if (payment.status === PaymentStatus.PAID) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Cannot remove paid payment!");
+  }
+
+  // Delete the payment record
+  await prisma.payment.delete({
+    where: {
+      id: paymentId,
+    },
+  });
+
+  return {  };
+};
+
 const validatePayment = async (payload: { tran_id?: string }) => {
   if (!payload.tran_id) {
     throw new AppError(httpStatus.BAD_REQUEST, "Transaction id not found!");
@@ -126,6 +151,18 @@ const validatePayment = async (payload: { tran_id?: string }) => {
 
   if (!isPaymentExist) {
     throw new AppError(httpStatus.NOT_FOUND, "Payment not found!");
+  }
+
+  // Check if payment is unpaid and older than 24 hours
+  if (isPaymentExist.status === PaymentStatus.UNPAID) {
+    const paymentAge = Date.now() - isPaymentExist.createdAt.getTime();
+    const hoursOld = paymentAge / (1000 * 60 * 60);
+
+    if (hoursOld >= 24) {
+      // Remove unpaid payment if it's older than 24 hours
+      await removeUnpaidPayment(isPaymentExist.id);
+      throw new AppError(httpStatus.BAD_REQUEST, "Payment expired. Please try purchasing again.");
+    }
   }
 
   const result = await prisma.$transaction(async (tx) => {
@@ -256,5 +293,6 @@ export const PaymentService = {
   initPayment,
   validatePayment,
   getAllPayment,
-  getVerifyPayment
+  getVerifyPayment,
+  removeUnpaidPayment,
 };

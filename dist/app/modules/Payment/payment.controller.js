@@ -54,9 +54,20 @@ const validatePayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
         res.redirect(`${config_1.default.ssl.failed_url}/failed`);
     }
 }));
+const removeUnpaidPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { paymentId } = req.params;
+    const result = yield payment_service_1.PaymentService.removeUnpaidPayment(paymentId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Unpaid payment removed successfully",
+        data: result,
+    });
+}));
 exports.PaymentController = {
     initPayment,
     validatePayment,
     getAllPayment,
-    getVerifyPayment
+    getVerifyPayment,
+    removeUnpaidPayment
 };

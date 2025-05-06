@@ -13,4 +13,6 @@ router.post("/init-payment", (0, auth_1.default)(client_1.UserRole.USER, client_
 router.get("/", (0, auth_1.default)(client_1.UserRole.ADMIN), payment_controller_1.PaymentController.getAllPayment);
 router.get("/verify-payment", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), payment_controller_1.PaymentController.getVerifyPayment);
 router.post("/ipn", payment_controller_1.PaymentController.validatePayment);
+// Add route to remove unpaid payment
+router.delete("/remove-unpaid/:paymentId", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), payment_controller_1.PaymentController.removeUnpaidPayment);
 exports.PaymentRoutes = router;

@@ -160,11 +160,43 @@ const deleteDiscount = async (id: string) => {
   return null;
 };
 
+const deactivateExpiredDiscounts = async () => {
+  const now = new Date();
+  
+  // Find all active discounts that have expired
+  const expiredDiscounts = await prisma.discount.findMany({
+    where: {
+      isActive: true,
+      endDate: {
+        lt: now
+      }
+    }
+  });
+
+  // Deactivate each expired discount
+  for (const discount of expiredDiscounts) {
+    await prisma.discount.update({
+      where: {
+        id: discount.id
+      },
+      data: {
+        isActive: false
+      }
+    });
+  }
+
+  return {
+    message: `Deactivated ${expiredDiscounts.length} expired discounts`,
+    deactivatedCount: expiredDiscounts.length
+  };
+};
+
 export const DiscountService = {
   createDiscount,
   getAllDiscounts,
   getActiveDiscounts,
+  getSingleDiscoundByContentId,
   updateDiscount,
   deleteDiscount,
-  getSingleDiscoundByContentId
+  deactivateExpiredDiscounts
 }; 

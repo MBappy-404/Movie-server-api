@@ -121,11 +121,39 @@ const deleteDiscount = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return null;
 });
+const deactivateExpiredDiscounts = () => __awaiter(void 0, void 0, void 0, function* () {
+    const now = new Date();
+    // Find all active discounts that have expired
+    const expiredDiscounts = yield prisma_1.default.discount.findMany({
+        where: {
+            isActive: true,
+            endDate: {
+                lt: now
+            }
+        }
+    });
+    // Deactivate each expired discount
+    for (const discount of expiredDiscounts) {
+        yield prisma_1.default.discount.update({
+            where: {
+                id: discount.id
+            },
+            data: {
+                isActive: false
+            }
+        });
+    }
+    return {
+        message: `Deactivated ${expiredDiscounts.length} expired discounts`,
+        deactivatedCount: expiredDiscounts.length
+    };
+});
 exports.DiscountService = {
     createDiscount,
     getAllDiscounts,
     getActiveDiscounts,
+    getSingleDiscoundByContentId,
     updateDiscount,
     deleteDiscount,
-    getSingleDiscoundByContentId
+    deactivateExpiredDiscounts
 };

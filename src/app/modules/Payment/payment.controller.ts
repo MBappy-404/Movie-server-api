@@ -44,9 +44,21 @@ const validatePayment = catchAsync(async (req, res) => {
   }
 });
 
+const removeUnpaidPayment = catchAsync(async (req, res) => {
+  const { paymentId } = req.params;
+  const result = await PaymentService.removeUnpaidPayment(paymentId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Unpaid payment removed successfully",
+    data: result,
+  });
+});
+
 export const PaymentController = {
   initPayment,
   validatePayment,
   getAllPayment,
-  getVerifyPayment
+  getVerifyPayment,
+  removeUnpaidPayment
 };
