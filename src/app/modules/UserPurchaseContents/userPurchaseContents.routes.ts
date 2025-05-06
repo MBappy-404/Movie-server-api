@@ -14,7 +14,7 @@ router.get(
 
 router.get(
   "/my-purchase-contents",
-  auth(UserRole.USER),
+  auth(UserRole.USER, UserRole.ADMIN),
   UserPurchaseContentsController.getMyPurchaseContents
 );
 
