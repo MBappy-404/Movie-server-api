@@ -43,16 +43,14 @@ const createContentIntoDB = async (req: any) => {
 
 
 const getSingleContentFromDB = async (id: string) => {
+  // Check if content exists
   await prisma.content.findUniqueOrThrow({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
+  // Fetch full content data including relations
   const result = await prisma.content.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       genre: true,
       platform: true,
@@ -61,7 +59,7 @@ const getSingleContentFromDB = async (id: string) => {
           user: true,
           _count: {
             select: { like: true },
-          }
+          },
         },
       },
     },
@@ -71,21 +69,42 @@ const getSingleContentFromDB = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found");
   }
 
-  // Calculate average rating for the specific content
-  const contentWithAvgRating = {
-    ...result,
-    averageRating:
-      result.reviews.length > 0
-        ? result.reviews.reduce(
-            (acc, review) => acc + review.rating,
-            0
-          ) / result.reviews.length
-        : 0,
-    totalReviews: result.reviews.length
-  };
+  // Count CLASSIC and UNDERRATED tags
+  const classicCount = result.reviews.filter((r) => r.tags === "CLASSIC").length;
+  const underratedCount = result.reviews.filter((r) => r.tags === "UNDERRATED").length;
 
-  return contentWithAvgRating;
+  const dominantTag = classicCount >= underratedCount ? "CLASSIC" : "UNDERRATED";
+
+  // Update spoilerWarning  
+  const updatedContent = await prisma.content.update({
+    where: { id },
+    data: {
+      spoilerWarning: dominantTag,
+    },
+  });
+
+  // Calculate average rating
+  const averageRating =
+    result.reviews.length > 0
+      ? parseFloat(
+          (
+            result.reviews.reduce((acc, r) => acc + r.rating, 0) / result.reviews.length
+          ).toFixed(1)
+        )
+      : 0;
+
+  const totalReviews = result.reviews.length;
+
+  // Final return object
+  return {
+    ...result,                        
+    spoilerWarning: updatedContent.spoilerWarning, // updated field
+    averageRating,
+    totalReviews,
+                       
+  };
 };
+
 
 const deleteSingleContentFromDB = async (id: string) => {
   await prisma.content.findUniqueOrThrow({
@@ -225,17 +244,17 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 
         const contentsWithAvgRating = contents.map((content) => {
           const reviews = content.reviews as { rating: number }[];
+          const average =
+            reviews.length > 0
+              ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+              : 0;
+        
           return {
             ...content,
-            averageRating:
-              reviews.length > 0
-                ? reviews.reduce(
-                    (acc: number, review: { rating: number }) => acc + review.rating,
-                    0
-                  ) / reviews.length
-                : 0
+            averageRating: parseFloat(average.toFixed(1)), //  
           };
         });
+        
 
         contentsWithAvgRating.sort((a, b) =>
           sortOrder === "asc"
@@ -282,19 +301,19 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         // Calculate average rating for each content
         const contentsWithReviewCountAndRating = contentsWithReviewCount.map((content) => {
           const reviews = content.reviews as { rating: number }[];
-          const averageRating = reviews.length > 0
-            ? reviews.reduce(
-                (acc: number, review: { rating: number }) => acc + review.rating,
-                0
-              ) / reviews.length
-            : 0;
-
+        
+          const averageRating =
+            reviews.length > 0
+              ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+              : 0;
+        
           return {
             ...content,
-            averageRating: Number(averageRating.toFixed(1)), // Round to 1 decimal place
-            totalReviews: reviews.length
+            averageRating: Number(averageRating.toFixed(1)),  
+            totalReviews: reviews.length,                    
           };
         });
+        
 
         return {
           meta: {

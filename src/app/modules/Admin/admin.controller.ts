@@ -3,19 +3,26 @@ import httpStatus from "http-status";
 import sendResponse from "../../helper/sendResponse";
 import { AdminService } from "./admin.service";
 
-
-const AdminBlockUser = catchAsync(async(req, res)=> {
-    const {userId}: any = req.params;
-    await AdminService.UserBlockIntoDB(userId)
-    sendResponse(res, {
-        success: true,
-        message: 'User blocked successfully',
-        statusCode: httpStatus.OK,
-
-    })
-}
-)
+const AdminBlockUser = catchAsync(async (req, res) => {
+  const { userId }: any = req.params;
+  await AdminService.UserBlockIntoDB(userId);
+  sendResponse(res, {
+    success: true,
+    message: "User blocked successfully",
+    statusCode: httpStatus.OK,
+  });
+});
+const getAdminDashboardStats = catchAsync(async (req, res) => {
+  const result = await AdminService.getAdminDashboardStats();
+  sendResponse(res, {
+    success: true,
+    message: "Dashboard stats fetched successfully",
+    statusCode: httpStatus.OK,
+    data: result,
+  });
+});
 
 export const AdminController = {
-    AdminBlockUser
-}
+  AdminBlockUser,
+  getAdminDashboardStats
+};
