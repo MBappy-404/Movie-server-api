@@ -80,20 +80,37 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
     };
 });
 const getLikeDislikeCounts = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { reviewId } = req.params;
-    const likes = yield prisma_1.default.like.count({
-        where: {
-            reviewId,
-            status: 'LIKED',
-        },
-    });
-    const dislikes = yield prisma_1.default.like.count({
-        where: {
-            reviewId,
-            status: 'DISLIKED',
-        },
-    });
-    return { likes, dislikes };
+    const [likes, dislikes, userLike] = yield Promise.all([
+        prisma_1.default.like.count({
+            where: {
+                reviewId,
+                status: 'LIKED',
+            },
+        }),
+        prisma_1.default.like.count({
+            where: {
+                reviewId,
+                status: 'DISLIKED',
+            },
+        }),
+        prisma_1.default.like.findFirst({
+            where: {
+                reviewId,
+                userId: req.user.id,
+            },
+            select: {
+                status: true,
+            },
+        }),
+    ]);
+    return {
+        reviewId,
+        likeCount: likes,
+        dislikeCount: dislikes,
+        currentUserLikeStatus: (_a = userLike === null || userLike === void 0 ? void 0 : userLike.status) !== null && _a !== void 0 ? _a : null,
+    };
 });
 // const addLike = async (payload: Like) => {
 //   const isUserExist = await prisma.user.findUnique({

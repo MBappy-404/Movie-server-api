@@ -10,6 +10,6 @@ const auth_1 = __importDefault(require("../../middleware/auth"));
 const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 router.post("/", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), like_controller_1.LikeController.addLike);
-router.get('/:reviewId', like_controller_1.LikeController.GetLikesDislikesByReviewId);
+router.get('/:reviewId', (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), like_controller_1.LikeController.GetLikesDislikesByReviewId);
 router.patch("/:id", like_controller_1.LikeController.updateLike);
 exports.LikeRoutes = router;

@@ -13,7 +13,7 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 router.post("/", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), (0, validateRequest_1.default)(reviews_validation_1.ReviewValidations.addReviewValidationSchema), reviews_controller_1.ReviewsController.addReviews);
 router.get("/", reviews_controller_1.ReviewsController.getAllReviews);
-router.get("/:contentId", reviews_controller_1.ReviewsController.getAllReviewsById);
+router.get("/:contentId", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), reviews_controller_1.ReviewsController.getAllReviewsById);
 // router.get("/:id", ReviewsController.getSingleReviews);
 router.patch("/:id", (0, validateRequest_1.default)(reviews_validation_1.ReviewValidations.updateReviewValidationSchema), reviews_controller_1.ReviewsController.updateReview);
 router.delete("/:id", reviews_controller_1.ReviewsController.deleteReview);

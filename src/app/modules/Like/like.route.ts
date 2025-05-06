@@ -12,7 +12,7 @@ router.post(
   LikeController.addLike
 );
 
-router.get('/:reviewId', LikeController.GetLikesDislikesByReviewId)
+router.get('/:reviewId', auth(UserRole.USER, UserRole.ADMIN), LikeController.GetLikesDislikesByReviewId)
 
 router.patch(
   "/:id",

@@ -14,7 +14,7 @@ router.post(
   ReviewsController.addReviews
 );
 router.get("/", ReviewsController.getAllReviews);
-router.get("/:contentId", ReviewsController.getAllReviewsById);
+router.get("/:contentId", auth(UserRole.USER, UserRole.ADMIN), ReviewsController.getAllReviewsById);
 // router.get("/:id", ReviewsController.getSingleReviews);
 
 router.patch(

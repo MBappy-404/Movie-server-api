@@ -79,25 +79,39 @@ const addLike = async (payload: any, user: any) => {
   };
 };
 
-const getLikeDislikeCounts = async (req: any) => {
+const getLikeDislikeCounts = async (req: any,) => {
+  const { reviewId } = req.params;
 
-  const { reviewId } = req.params
+  const [likes, dislikes, userLike] = await Promise.all([
+    prisma.like.count({
+      where: {
+        reviewId,
+        status: 'LIKED',
+      },
+    }),
+    prisma.like.count({
+      where: {
+        reviewId,
+        status: 'DISLIKED',
+      },
+    }),
+    prisma.like.findFirst({
+      where: {
+        reviewId,
+        userId: req.user.id,
+      },
+      select: {
+        status: true,
+      },
+    }),
+  ]);
 
-  const likes = await prisma.like.count({
-    where: {
-      reviewId,
-      status: 'LIKED',
-    },
-  });
-
-  const dislikes = await prisma.like.count({
-    where: {
-      reviewId,
-      status: 'DISLIKED',
-    },
-  });
-
-  return { likes, dislikes };
+  return {
+    reviewId,
+    likeCount: likes,
+    dislikeCount: dislikes,
+    currentUserLikeStatus: userLike?.status ?? null,
+  };
 };
 
 // const addLike = async (payload: Like) => {
