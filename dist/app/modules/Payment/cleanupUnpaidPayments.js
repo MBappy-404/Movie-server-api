@@ -16,8 +16,8 @@ const prisma_1 = __importDefault(require("../../helper/prisma"));
 const client_1 = require("@prisma/client");
 const cleanupUnpaidPayments = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Find all unpaid payments older than 24 hours
-        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        // Find all unpaid payments older than 1 hours
+        const twentyFourHoursAgo = new Date(Date.now() - 60 * 60 * 1000);
         const unpaidPayments = yield prisma_1.default.payment.findMany({
             where: {
                 status: client_1.PaymentStatus.UNPAID,

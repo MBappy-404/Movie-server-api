@@ -3,8 +3,8 @@ import { PaymentStatus } from "@prisma/client";
 
 const cleanupUnpaidPayments = async () => {
   try {
-    // Find all unpaid payments older than 24 hours
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // Find all unpaid payments older than 1 hours
+    const twentyFourHoursAgo = new Date(Date.now() - 60 * 60 * 1000);
 
     const unpaidPayments = await prisma.payment.findMany({
       where: {
