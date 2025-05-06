@@ -19,11 +19,11 @@ const prisma_1 = __importDefault(require("../../helper/prisma"));
 const http_status_1 = __importDefault(require("http-status"));
 const UserBlockIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.user.findFirstOrThrow({
-        where: { id }
+        where: { id },
     });
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const verifydata = yield transactionClient.user.findFirst({
-            where: { id }
+            where: { id },
         });
         if ((verifydata === null || verifydata === void 0 ? void 0 : verifydata.status) === "BLOCKED") {
             throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "User already blocked");
@@ -31,12 +31,25 @@ const UserBlockIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
         yield transactionClient.user.update({
             where: { id },
             data: {
-                status: client_1.UserStatus.BLOCKED
-            }
+                status: client_1.UserStatus.BLOCKED,
+            },
         });
     }));
     return result;
 });
+const getAdminDashboardStats = () => __awaiter(void 0, void 0, void 0, function* () {
+    const totalUser = yield prisma_1.default.user.count();
+    const totalMovies = yield prisma_1.default.content.count();
+    const totalPayment = yield prisma_1.default.payment.count();
+    const totalEaring = yield prisma_1.default.payment.aggregate({ _sum: { amount: true } });
+    return {
+        totalUser,
+        totalMovies,
+        totalPayment,
+        totalEaring
+    };
+});
 exports.AdminService = {
-    UserBlockIntoDB
+    UserBlockIntoDB,
+    getAdminDashboardStats,
 };

@@ -22,10 +22,20 @@ const AdminBlockUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
     yield admin_service_1.AdminService.UserBlockIntoDB(userId);
     (0, sendResponse_1.default)(res, {
         success: true,
-        message: 'User blocked successfully',
+        message: "User blocked successfully",
         statusCode: http_status_1.default.OK,
     });
 }));
+const getAdminDashboardStats = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield admin_service_1.AdminService.getAdminDashboardStats();
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        message: "Dashboard stats fetched successfully",
+        statusCode: http_status_1.default.OK,
+        data: result,
+    });
+}));
 exports.AdminController = {
-    AdminBlockUser
+    AdminBlockUser,
+    getAdminDashboardStats
 };

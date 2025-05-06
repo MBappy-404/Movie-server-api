@@ -52,15 +52,13 @@ const createContentIntoDB = (req) => __awaiter(void 0, void 0, void 0, function*
     return result;
 });
 const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if content exists
     yield prisma_1.default.content.findUniqueOrThrow({
-        where: {
-            id,
-        },
+        where: { id },
     });
+    // Fetch full content data including relations
     const result = yield prisma_1.default.content.findUnique({
-        where: {
-            id,
-        },
+        where: { id },
         include: {
             genre: true,
             platform: true,
@@ -69,7 +67,7 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
                     user: true,
                     _count: {
                         select: { like: true },
-                    }
+                    },
                 },
             },
         },
@@ -77,11 +75,26 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     if (!result) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Content not found");
     }
-    // Calculate average rating for the specific content
-    const contentWithAvgRating = Object.assign(Object.assign({}, result), { averageRating: result.reviews.length > 0
-            ? result.reviews.reduce((acc, review) => acc + review.rating, 0) / result.reviews.length
-            : 0, totalReviews: result.reviews.length });
-    return contentWithAvgRating;
+    // Count CLASSIC and UNDERRATED tags
+    const classicCount = result.reviews.filter((r) => r.tags === "CLASSIC").length;
+    const underratedCount = result.reviews.filter((r) => r.tags === "UNDERRATED").length;
+    const dominantTag = classicCount >= underratedCount ? "CLASSIC" : "UNDERRATED";
+    // Update spoilerWarning  
+    const updatedContent = yield prisma_1.default.content.update({
+        where: { id },
+        data: {
+            spoilerWarning: dominantTag,
+        },
+    });
+    // Calculate average rating
+    const averageRating = result.reviews.length > 0
+        ? parseFloat((result.reviews.reduce((acc, r) => acc + r.rating, 0) / result.reviews.length).toFixed(1))
+        : 0;
+    const totalReviews = result.reviews.length;
+    // Final return object
+    return Object.assign(Object.assign({}, result), { spoilerWarning: updatedContent.spoilerWarning, // updated field
+        averageRating,
+        totalReviews });
 });
 const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.content.findUniqueOrThrow({
@@ -203,9 +216,10 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
                 });
                 const contentsWithAvgRating = contents.map((content) => {
                     const reviews = content.reviews;
-                    return Object.assign(Object.assign({}, content), { averageRating: reviews.length > 0
-                            ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
-                            : 0 });
+                    const average = reviews.length > 0
+                        ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+                        : 0;
+                    return Object.assign(Object.assign({}, content), { averageRating: parseFloat(average.toFixed(1)) });
                 });
                 contentsWithAvgRating.sort((a, b) => sortOrder === "asc"
                     ? a.averageRating - b.averageRating

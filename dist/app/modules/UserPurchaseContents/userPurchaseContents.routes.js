@@ -10,5 +10,5 @@ const client_1 = require("@prisma/client");
 const userPurchaseContents_controller_1 = require("./userPurchaseContents.controller");
 const router = express_1.default.Router();
 router.get("/", (0, auth_1.default)(client_1.UserRole.ADMIN), userPurchaseContents_controller_1.UserPurchaseContentsController.getAllUserPurchaseContents);
-router.get("/my-purchase-contents", (0, auth_1.default)(client_1.UserRole.USER), userPurchaseContents_controller_1.UserPurchaseContentsController.getMyPurchaseContents);
+router.get("/my-purchase-contents", (0, auth_1.default)(client_1.UserRole.USER, client_1.UserRole.ADMIN), userPurchaseContents_controller_1.UserPurchaseContentsController.getMyPurchaseContents);
 exports.UserPurchaseContentsRoutes = router;
