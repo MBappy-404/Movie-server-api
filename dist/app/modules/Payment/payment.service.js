@@ -83,7 +83,6 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         transactionId: trxId,
         status: client_1.PaymentStatus.UNPAID,
         purchaseStatus: payload.status,
-        discountId: activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.id,
         originalAmount: originalAmount,
         discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
     };

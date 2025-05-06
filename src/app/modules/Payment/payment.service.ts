@@ -81,7 +81,6 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
     transactionId: trxId,
     status: PaymentStatus.UNPAID,
     purchaseStatus: payload.status,
-    discountId: activeDiscount?.id,
     originalAmount: originalAmount,
     discountPercentage: activeDiscount?.percentage || 0,
   };
