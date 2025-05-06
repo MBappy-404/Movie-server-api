@@ -4,6 +4,7 @@ import { PaymentStatus, purchaseStatus } from "@prisma/client";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { IUserPurchaseContents } from "../UserPurchaseContents/userPurchaseContents.interface";
+import { IPayment, IPaymentCreate } from "./payment.interface";
 import emailSender from "./sendEmail";
 
 const initPayment = async (payload: IUserPurchaseContents, user: any) => {
@@ -50,18 +51,43 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
 
   const trxId = `${userData?.id}-${contentData?.id}`;
 
-  // Determine the amount based on purchase status
-  const amount = payload.status === purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+  // Check for active discount
+  const activeDiscount = await prisma.discount.findFirst({
+    where: {
+      contentId: contentData.id,
+      isActive: true,
+      startDate: {
+        lte: new Date(),
+      },
+      endDate: {
+        gte: new Date(),
+      },
+    },
+  });
+
+  // Calculate the amount based on purchase status and apply discount if available
+  let amount = payload.status === purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+  const originalAmount = amount;
+  
+  if (activeDiscount) {
+    const discountAmount = (amount * activeDiscount.percentage) / 100;
+    amount = amount - discountAmount;
+  }
+
+  const paymentCreateData: IPaymentCreate = {
+    userId: userData.id,
+    contentId: contentData.id,
+    amount: amount,
+    transactionId: trxId,
+    status: PaymentStatus.UNPAID,
+    purchaseStatus: payload.status,
+    discountId: activeDiscount?.id,
+    originalAmount: originalAmount,
+    discountPercentage: activeDiscount?.percentage || 0,
+  };
 
   const newPayment = await prisma.payment.create({
-    data: {
-      userId: userData.id,
-      contentId: contentData.id,
-      amount: amount,
-      transactionId: trxId,
-      status: PaymentStatus.UNPAID,
-      purchaseStatus: payload.status,
-    },
+    data: paymentCreateData,
   });
 
   const initPaymentData = {
@@ -72,11 +98,19 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
     userId: userData.id,
     contentId: contentData.id,
     purchaseStatus: payload.status,
+    originalAmount: originalAmount,
+    discountPercentage: activeDiscount?.percentage || 0,
   };
 
   const result = await SSLService.initPayment(initPaymentData);
   return {
     paymentUrl: result,
+    paymentDetails: {
+      amount: newPayment.amount,
+      originalAmount: originalAmount,
+      discountPercentage: activeDiscount?.percentage || 0,
+      discountApplied: !!activeDiscount,
+    },
   };
 };
 

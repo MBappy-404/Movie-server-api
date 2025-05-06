@@ -14,6 +14,7 @@ import { LikeRoutes } from "../modules/Like/like.route";
 import { UserPurchaseContentsRoutes } from "../modules/UserPurchaseContents/userPurchaseContents.routes";
 import { PaymentRoutes } from "../modules/Payment/payment.routes";
 import { ContentLinksRoutes } from "../modules/ContentLinks/contentLinks.routes";
+import { DiscountRoutes } from "../modules/Discount/discount.routes";
 
 const router = Router();
 
@@ -65,6 +66,10 @@ const moduleRoutes = [
   {
     path: "/content-links",
     routes: ContentLinksRoutes,
+  },
+  {
+    path: "/discount",
+    routes: DiscountRoutes,
   },
 ];
 

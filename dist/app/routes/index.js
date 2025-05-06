@@ -13,6 +13,7 @@ const like_route_1 = require("../modules/Like/like.route");
 const userPurchaseContents_routes_1 = require("../modules/UserPurchaseContents/userPurchaseContents.routes");
 const payment_routes_1 = require("../modules/Payment/payment.routes");
 const contentLinks_routes_1 = require("../modules/ContentLinks/contentLinks.routes");
+const discount_routes_1 = require("../modules/Discount/discount.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -62,6 +63,10 @@ const moduleRoutes = [
     {
         path: "/content-links",
         routes: contentLinks_routes_1.ContentLinksRoutes,
+    },
+    {
+        path: "/discount",
+        routes: discount_routes_1.DiscountRoutes,
     },
 ];
 moduleRoutes.forEach(({ path, routes }) => {

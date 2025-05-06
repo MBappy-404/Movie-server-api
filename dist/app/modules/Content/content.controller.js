@@ -56,8 +56,9 @@ const getAllContentData = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(v
         statusCode: http_status_1.default.OK,
         success: true,
         message: "Contents data fetched!",
-        meta: result.meta,
-        data: result.data
+        data: result
+        // meta: result.meta,
+        // data: result.data
     });
 }));
 const updateContent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

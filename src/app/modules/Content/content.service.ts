@@ -141,247 +141,250 @@ const deleteSingleContentFromDB = async (id: string) => {
 };
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
-  const { page, limit, skip } = paginationHelper.calculatePagination(options);
-  const { searchTerm, genre, platform, ...filterData } = params;
 
-  const andCondition: Prisma.ContentWhereInput[] = [];
+  const allcontent  =await prisma.content.findMany();
+  return allcontent
+  // const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  // const { searchTerm, genre, platform, ...filterData } = params;
 
-  if (searchTerm) {
-    andCondition.push({
-      OR: [
-        { title: { contains: searchTerm, mode: "insensitive" } },
-        { synopsis: { contains: searchTerm, mode: "insensitive" } },
-        { releaseYear: { contains: searchTerm, mode: "insensitive" } },
-        { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
-        {
-          platform: {
-            platformName: { contains: searchTerm, mode: "insensitive" },
-          },
-        },
-        { director: { contains: searchTerm, mode: "insensitive" } },
-        { actor: { contains: searchTerm, mode: "insensitive" } },
-        { actress: { contains: searchTerm, mode: "insensitive" } },
-      ],
-    });
-  }
+  // const andCondition: Prisma.ContentWhereInput[] = [];
 
-  if (genre && genre.length > 0) {
-    andCondition.push({
-      genre: {
-        genreName: {
-          contains: genre,
-          mode: "insensitive",
-        },
-      },
-    });
-  }
+  // if (searchTerm) {
+  //   andCondition.push({
+  //     OR: [
+  //       { title: { contains: searchTerm, mode: "insensitive" } },
+  //       { synopsis: { contains: searchTerm, mode: "insensitive" } },
+  //       { releaseYear: { contains: searchTerm, mode: "insensitive" } },
+  //       { genre: { genreName: { contains: searchTerm, mode: "insensitive" } } },
+  //       {
+  //         platform: {
+  //           platformName: { contains: searchTerm, mode: "insensitive" },
+  //         },
+  //       },
+  //       { director: { contains: searchTerm, mode: "insensitive" } },
+  //       { actor: { contains: searchTerm, mode: "insensitive" } },
+  //       { actress: { contains: searchTerm, mode: "insensitive" } },
+  //     ],
+  //   });
+  // }
 
-  if (platform && platform.length > 0) {
-    andCondition.push({
-      platform: {
-        platformName: {
-          contains: platform,
-          mode: "insensitive",
-        },
-      },
-    });
-  }
+  // if (genre && genre.length > 0) {
+  //   andCondition.push({
+  //     genre: {
+  //       genreName: {
+  //         contains: genre,
+  //         mode: "insensitive",
+  //       },
+  //     },
+  //   });
+  // }
 
-  if (Object.keys(filterData).length > 0) {
-    andCondition.push({
-      AND: Object.keys(filterData).map((key) => ({
-        [key]: {
-          equals: (filterData as any)[key],
-        },
-      })),
-    });
-  }
+  // if (platform && platform.length > 0) {
+  //   andCondition.push({
+  //     platform: {
+  //       platformName: {
+  //         contains: platform,
+  //         mode: "insensitive",
+  //       },
+  //     },
+  //   });
+  // }
 
-  const whereConditions: Prisma.ContentWhereInput =
-    andCondition.length > 0 ? { AND: andCondition } : {};
+  // if (Object.keys(filterData).length > 0) {
+  //   andCondition.push({
+  //     AND: Object.keys(filterData).map((key) => ({
+  //       [key]: {
+  //         equals: (filterData as any)[key],
+  //       },
+  //     })),
+  //   });
+  // }
 
-  let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: "desc" }; // default
+  // const whereConditions: Prisma.ContentWhereInput =
+  //   andCondition.length > 0 ? { AND: andCondition } : {};
 
-  if (options.sortBy) {
-    const sortOrder =
-      options.sortOrder?.toLowerCase() === "asc" ? "asc" : "desc";
+  // let orderBy: Prisma.ContentOrderByWithRelationInput = { createdAt: "desc" }; // default
 
-    switch (options.sortBy) {
-      case "rating":
-        // Sort by average rating from reviews
-        const contents = await prisma.content.findMany({
-          where: whereConditions,
-          include: {
-            genre: true,
-            platform: true,
-            ContentLinks: true,
-            reviews: {
-              select: {
-                rating: true
-              }
-            }
-          }
-        });
+  // if (options.sortBy) {
+  //   const sortOrder =
+  //     options.sortOrder?.toLowerCase() === "asc" ? "asc" : "desc";
 
-        const contentsWithAvgRating = contents.map((content) => {
-          const reviews = content.reviews as { rating: number }[];
-          return {
-            ...content,
-            averageRating:
-              reviews.length > 0
-                ? reviews.reduce(
-                    (acc: number, review: { rating: number }) => acc + review.rating,
-                    0
-                  ) / reviews.length
-                : 0
-          };
-        });
+  //   switch (options.sortBy) {
+  //     case "rating":
+  //       // Sort by average rating from reviews
+  //       const contents = await prisma.content.findMany({
+  //         where: whereConditions,
+  //         include: {
+  //           genre: true,
+  //           platform: true,
+  //           ContentLinks: true,
+  //           reviews: {
+  //             select: {
+  //               rating: true
+  //             }
+  //           }
+  //         }
+  //       });
 
-        contentsWithAvgRating.sort((a, b) =>
-          sortOrder === "asc"
-            ? a.averageRating - b.averageRating
-            : b.averageRating - a.averageRating
-        );
+  //       const contentsWithAvgRating = contents.map((content) => {
+  //         const reviews = content.reviews as { rating: number }[];
+  //         return {
+  //           ...content,
+  //           averageRating:
+  //             reviews.length > 0
+  //               ? reviews.reduce(
+  //                   (acc: number, review: { rating: number }) => acc + review.rating,
+  //                   0
+  //                 ) / reviews.length
+  //               : 0
+  //         };
+  //       });
 
-        return {
-          meta: {
-            page,
-            limit,
-            total: contents.length,
-          },
-          data: contentsWithAvgRating.slice(skip, skip + limit),
-        };
+  //       contentsWithAvgRating.sort((a, b) =>
+  //         sortOrder === "asc"
+  //           ? a.averageRating - b.averageRating
+  //           : b.averageRating - a.averageRating
+  //       );
 
-      case "reviews":
-        // Sort by number of reviews
-        const contentsWithReviewCount = await prisma.content.findMany({
-          where: whereConditions,
-          include: {
-            genre: true,
-            platform: true,
-            ContentLinks: true,
-            reviews: {
-              select: {
-                rating: true
-              }
-            }
-          },
-          orderBy: {
-            reviews: {
-              _count: sortOrder
-            }
-          },
-          skip,
-          take: limit,
-        });
+  //       return {
+  //         meta: {
+  //           page,
+  //           limit,
+  //           total: contents.length,
+  //         },
+  //         data: contentsWithAvgRating.slice(skip, skip + limit),
+  //       };
 
-        const total = await prisma.content.count({
-          where: whereConditions,
-        });
+  //     case "reviews":
+  //       // Sort by number of reviews
+  //       const contentsWithReviewCount = await prisma.content.findMany({
+  //         where: whereConditions,
+  //         include: {
+  //           genre: true,
+  //           platform: true,
+  //           ContentLinks: true,
+  //           reviews: {
+  //             select: {
+  //               rating: true
+  //             }
+  //           }
+  //         },
+  //         orderBy: {
+  //           reviews: {
+  //             _count: sortOrder
+  //           }
+  //         },
+  //         skip,
+  //         take: limit,
+  //       });
 
-        // Calculate average rating for each content
-        const contentsWithReviewCountAndRating = contentsWithReviewCount.map((content) => {
-          const reviews = content.reviews as { rating: number }[];
-          const averageRating = reviews.length > 0
-            ? reviews.reduce(
-                (acc: number, review: { rating: number }) => acc + review.rating,
-                0
-              ) / reviews.length
-            : 0;
+  //       const total = await prisma.content.count({
+  //         where: whereConditions,
+  //       });
 
-          return {
-            ...content,
-            averageRating: Number(averageRating.toFixed(1)), // Round to 1 decimal place
-            totalReviews: reviews.length
-          };
-        });
+  //       // Calculate average rating for each content
+  //       const contentsWithReviewCountAndRating = contentsWithReviewCount.map((content) => {
+  //         const reviews = content.reviews as { rating: number }[];
+  //         const averageRating = reviews.length > 0
+  //           ? reviews.reduce(
+  //               (acc: number, review: { rating: number }) => acc + review.rating,
+  //               0
+  //             ) / reviews.length
+  //           : 0;
 
-        return {
-          meta: {
-            page,
-            limit,
-            total,
-          },
-          data: contentsWithReviewCountAndRating,
-        };
+  //         return {
+  //           ...content,
+  //           averageRating: Number(averageRating.toFixed(1)), // Round to 1 decimal place
+  //           totalReviews: reviews.length
+  //         };
+  //       });
 
-      case "latest":
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 7);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
+  //       return {
+  //         meta: {
+  //           page,
+  //           limit,
+  //           total,
+  //         },
+  //         data: contentsWithReviewCountAndRating,
+  //       };
 
-        andCondition.push({
-          createdAt: {
-            gte: startDate,
-            lte: endDate,
-          },
-        });
+  //     case "latest":
+  //       const endDate = new Date();
+  //       const startDate = new Date();
+  //       startDate.setDate(endDate.getDate() - 7);
+  //       startDate.setHours(0, 0, 0, 0);
+  //       endDate.setHours(23, 59, 59, 999);
 
-        orderBy = { createdAt: sortOrder };
-        break;
+  //       andCondition.push({
+  //         createdAt: {
+  //           gte: startDate,
+  //           lte: endDate,
+  //         },
+  //       });
 
-      case "title":
-        orderBy = { title: sortOrder };
-        break;
+  //       orderBy = { createdAt: sortOrder };
+  //       break;
 
-      case "price":
-        orderBy = { price: sortOrder };
-        break;
+  //     case "title":
+  //       orderBy = { title: sortOrder };
+  //       break;
 
-      case "releaseYear":
-        orderBy = { releaseYear: sortOrder };
-        break;
-    }
-  }
+  //     case "price":
+  //       orderBy = { price: sortOrder };
+  //       break;
 
-  // Default query for all other cases
-  const result = await prisma.content.findMany({
-    where: whereConditions,
-    skip,
-    take: limit,
-    orderBy,
-    include: {
-      genre: true,
-      platform: true,
-      ContentLinks: true,
-      reviews: {
-        select: {
-          rating: true
-        }
-      }
-    },
-  });
+  //     case "releaseYear":
+  //       orderBy = { releaseYear: sortOrder };
+  //       break;
+  //   }
+  // }
 
-  const total = await prisma.content.count({
-    where: whereConditions,
-  });
+  // // Default query for all other cases
+  // const result = await prisma.content.findMany({
+  //   where: whereConditions,
+  //   skip,
+  //   take: limit,
+  //   orderBy,
+  //   include: {
+  //     genre: true,
+  //     platform: true,
+  //     ContentLinks: true,
+  //     reviews: {
+  //       select: {
+  //         rating: true
+  //       }
+  //     }
+  //   },
+  // });
 
-  // Calculate average rating for all content
-  const contentsWithAvgRating = result.map((content) => {
-    const reviews = content.reviews as { rating: number }[];
-    return {
-      ...content,
-      averageRating:
-        reviews.length > 0
-          ? reviews.reduce(
-              (acc: number, review: { rating: number }) => acc + review.rating,
-              0
-            ) / reviews.length
-          : 0,
-      totalReviews: reviews.length
-    };
-  });
+  // const total = await prisma.content.count({
+  //   where: whereConditions,
+  // });
 
-  return {
-    meta: {
-      page,
-      limit,
-      total,
-    },
-    data: contentsWithAvgRating,
-  };
+  // // Calculate average rating for all content
+  // const contentsWithAvgRating = result.map((content) => {
+  //   const reviews = content.reviews as { rating: number }[];
+  //   return {
+  //     ...content,
+  //     averageRating:
+  //       reviews.length > 0
+  //         ? reviews.reduce(
+  //             (acc: number, review: { rating: number }) => acc + review.rating,
+  //             0
+  //           ) / reviews.length
+  //         : 0,
+  //     totalReviews: reviews.length
+  //   };
+  // });
+
+  // return {
+  //   meta: {
+  //     page,
+  //     limit,
+  //     total,
+  //   },
+  //   data: contentsWithAvgRating,
+  // };
 };
 
 const updateContentIntoDB = async (req: any) => {
@@ -434,122 +437,6 @@ const updateContentIntoDB = async (req: any) => {
 
   return result;
 };
-
-// const searchAndFilterContent = async (query: {
-//   searchTerm?: string;
-//   genre?: string;
-//   director?: string;
-//   cast?: string;
-//   platform?: string;
-//   releaseYear?: string;
-//   ratingRange?: { min?: number; max?: number };
-//   sortBy?: 'rating' | 'reviews' | 'latest';
-//   page?: number;
-//   limit?: number;
-// }) => {
-//   const {
-//     searchTerm,
-//     genre,
-//     director,
-//     cast,
-//     platform,
-//     releaseYear,
-//     ratingRange,
-//     sortBy = 'latest',
-//     page = 1,
-//     limit = 10,
-//   } = query;
-
-//   const parsedPage = Number(page);
-//   const parsedLimit = Number(limit);
-//   const skip = (parsedPage - 1) * parsedLimit;
-
-//   console.log(typeof parsedPage, typeof parsedLimit);
-
-//   const where: any = {};
-
-//   if (searchTerm) {
-//     where.OR = [
-//       { title: { contains: searchTerm, mode: 'insensitive' } },
-//       { synopsis: { contains: searchTerm, mode: 'insensitive' } },
-//       { genre: { contains: searchTerm, mode: 'insensitive' } },
-//     ];
-//   }
-
-//   if (genre) {
-//     where.genre = {
-//       genreName: { equals: genre, mode: 'insensitive' },
-//     };
-//   }
-
-//   if (director) {
-//     where.director = { contains: director, mode: 'insensitive' };
-//   }
-
-//   if (cast) {
-//     where.OR = [
-//       { actor: { contains: cast, mode: 'insensitive' } },
-//       { actress: { contains: cast, mode: 'insensitive' } },
-//     ];
-//   }
-
-//   if (platform) {
-//     where.platform = {
-//       platformName: { equals: platform, mode: 'insensitive' },
-//     };
-//   }
-
-//   if (releaseYear) {
-//     where.releaseYear = releaseYear;
-//   }
-
-//   if (ratingRange) {
-//     where.price = {
-//       ...(ratingRange.min !== undefined && { gte: ratingRange.min }),
-//       ...(ratingRange.max !== undefined && { lte: ratingRange.max }),
-//     };
-//   }
-
-//   const orderBy: any = {};
-//   switch (sortBy) {
-//     case 'rating':
-//       // Assuming we'll add a reviewCount field later
-//       orderBy.price = 'desc';
-//       break;
-//     case 'reviews':
-//       // Assuming we'll add a reviewCount field later
-//       orderBy.createdAt = 'desc';
-//       break;
-//     case 'latest':
-//     default:
-//       orderBy.createdAt = 'desc';
-//       break;
-//   }
-
-//   const [contents, total] = await Promise.all([
-//     prisma.content.findMany({
-//       where,
-//       orderBy,
-//       skip,
-//       take: parsedLimit,
-//       include: {
-//         genre: true,
-//       },
-//     }),
-//     prisma.content.count({ where }),
-//   ]);
-
-//   return {
-//     contents,
-//     meta: {
-//       total,
-//       page: parsedPage,
-//       limit: parsedLimit,
-//       totalPages: Math.ceil(total / parsedLimit),
-//     },
-//   };
-// };
-
 export const ContentServices = {
   createContentIntoDB,
   getSingleContentFromDB,

@@ -56,17 +56,39 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Payment already made!");
     }
     const trxId = `${userData === null || userData === void 0 ? void 0 : userData.id}-${contentData === null || contentData === void 0 ? void 0 : contentData.id}`;
-    // Determine the amount based on purchase status
-    const amount = payload.status === client_1.purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
-    const newPayment = yield prisma_1.default.payment.create({
-        data: {
-            userId: userData.id,
+    // Check for active discount
+    const activeDiscount = yield prisma_1.default.discount.findFirst({
+        where: {
             contentId: contentData.id,
-            amount: amount,
-            transactionId: trxId,
-            status: client_1.PaymentStatus.UNPAID,
-            purchaseStatus: payload.status,
+            isActive: true,
+            startDate: {
+                lte: new Date(),
+            },
+            endDate: {
+                gte: new Date(),
+            },
         },
+    });
+    // Calculate the amount based on purchase status and apply discount if available
+    let amount = payload.status === client_1.purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+    const originalAmount = amount;
+    if (activeDiscount) {
+        const discountAmount = (amount * activeDiscount.percentage) / 100;
+        amount = amount - discountAmount;
+    }
+    const paymentCreateData = {
+        userId: userData.id,
+        contentId: contentData.id,
+        amount: amount,
+        transactionId: trxId,
+        status: client_1.PaymentStatus.UNPAID,
+        purchaseStatus: payload.status,
+        discountId: activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.id,
+        originalAmount: originalAmount,
+        discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
+    };
+    const newPayment = yield prisma_1.default.payment.create({
+        data: paymentCreateData,
     });
     const initPaymentData = {
         amount: newPayment.amount,
@@ -76,10 +98,18 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         userId: userData.id,
         contentId: contentData.id,
         purchaseStatus: payload.status,
+        originalAmount: originalAmount,
+        discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
     };
     const result = yield ssl_service_1.SSLService.initPayment(initPaymentData);
     return {
         paymentUrl: result,
+        paymentDetails: {
+            amount: newPayment.amount,
+            originalAmount: originalAmount,
+            discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
+            discountApplied: !!activeDiscount,
+        },
     };
 });
 const validatePayment = (payload) => __awaiter(void 0, void 0, void 0, function* () {
