@@ -52,9 +52,8 @@ const getAllContentData = catchAsync(async(req, res)=> {
       statusCode: httpstatus.OK,
       success: true,
       message: "Contents data fetched!",
-      data: result
-      // meta: result.meta,
-      // data: result.data
+      meta: result.meta,
+      data: result.data
   })
 })
 
