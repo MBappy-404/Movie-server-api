@@ -6,8 +6,8 @@ export type IPayment = {
   contentId: string;
   purchaseStatus: purchaseStatus;
   amount: number;
-  originalAmount?: number;
-  discountPercentage?: number;
+  originalAmount: number;
+  discountPercentage: number;
   discountId?: string;
   transactionId: string;
   status: PaymentStatus;
@@ -20,8 +20,8 @@ export type IPaymentCreate = {
   contentId: string;
   purchaseStatus: purchaseStatus;
   amount: number;
-  originalAmount?: number;
-  discountPercentage?: number;
+  originalAmount: number;
+  discountPercentage: number;
   discountId?: string;
   transactionId: string;
   status: PaymentStatus;

@@ -207,6 +207,8 @@ model Payment {
   purchaseStatus purchaseStatus
 
   amount        Float
+  originalAmount Float
+  discountPercentage Float @default(0)
   transactionId String        @unique
   status        PaymentStatus @default(UNPAID)
 
