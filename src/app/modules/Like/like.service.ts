@@ -17,6 +17,8 @@ const addLike = async (payload: any, user: any) => {
     },
   });
 
+  let currentStatus: 'LIKED' | 'DISLIKED' | null = null;
+
   if (existing) {
     if (existing.status === status) {
       // Toggle off: user clicked the same action again
@@ -25,6 +27,7 @@ const addLike = async (payload: any, user: any) => {
           id: existing.id,
         },
       });
+      currentStatus = null; // No current status
     } else {
       // Switch from like to dislike or vice versa
       await prisma.like.update({
@@ -35,6 +38,7 @@ const addLike = async (payload: any, user: any) => {
           status,
         },
       });
+      currentStatus = status;
     }
   } else {
     // New like or dislike
@@ -45,6 +49,7 @@ const addLike = async (payload: any, user: any) => {
         status,
       },
     });
+    currentStatus = status;
   }
 
   // Get updated counts
@@ -70,6 +75,7 @@ const addLike = async (payload: any, user: any) => {
     reviewId,
     likeCount: likes,
     dislikeCount: dislikes,
+    currentUserLikeStatus: currentStatus,
   };
 };
 

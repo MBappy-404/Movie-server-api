@@ -23,6 +23,7 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
             reviewId,
         },
     });
+    let currentStatus = null;
     if (existing) {
         if (existing.status === status) {
             // Toggle off: user clicked the same action again
@@ -31,6 +32,7 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
                     id: existing.id,
                 },
             });
+            currentStatus = null; // No current status
         }
         else {
             // Switch from like to dislike or vice versa
@@ -42,6 +44,7 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
                     status,
                 },
             });
+            currentStatus = status;
         }
     }
     else {
@@ -53,6 +56,7 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
                 status,
             },
         });
+        currentStatus = status;
     }
     // Get updated counts
     const likes = yield prisma_1.default.like.count({
@@ -72,6 +76,7 @@ const addLike = (payload, user) => __awaiter(void 0, void 0, void 0, function* (
         reviewId,
         likeCount: likes,
         dislikeCount: dislikes,
+        currentUserLikeStatus: currentStatus,
     };
 });
 const getLikeDislikeCounts = (req) => __awaiter(void 0, void 0, void 0, function* () {
