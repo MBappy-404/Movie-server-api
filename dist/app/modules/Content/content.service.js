@@ -129,6 +129,12 @@ const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, func
                 contentId: id
             }
         });
+        // Delete all discounts associated with this content
+        yield tx.discount.deleteMany({
+            where: {
+                contentId: id
+            }
+        });
         // Then delete the content link
         const linkinfo = yield tx.contentLinks.delete({
             where: {

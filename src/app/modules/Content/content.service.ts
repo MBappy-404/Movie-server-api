@@ -144,6 +144,13 @@ const deleteSingleContentFromDB = async (id: string) => {
       }
     });
 
+    // Delete all discounts associated with this content
+    await tx.discount.deleteMany({
+      where: {
+        contentId: id
+      }
+    });
+
     // Then delete the content link
     const linkinfo = await tx.contentLinks.delete({
       where: {
