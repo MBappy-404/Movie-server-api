@@ -15,7 +15,7 @@ app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: ['http://localhost:3000', 'https://cineverse-liart.vercel.app'], // Allow requests from this specific origi,
+    origin: ['https://cineverse-liart.vercel.app', 'http://localhost:3000',], // Allow requests from this specific origi,
     credentials: true
 }));
 app.use('/api', routes_1.default);
