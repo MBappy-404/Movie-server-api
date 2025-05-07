@@ -370,13 +370,15 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     orderBy,
     include: {
       genre: true,
+      
       platform: true,
       ContentLinks: true,
       reviews: {
         select: {
           rating: true
         }
-      }
+      },
+      discount: true
     },
   });
 

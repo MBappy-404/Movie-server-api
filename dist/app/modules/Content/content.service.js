@@ -318,7 +318,8 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
                 select: {
                     rating: true
                 }
-            }
+            },
+            discount: true
         },
     });
     const total = yield prisma_1.default.content.count({
