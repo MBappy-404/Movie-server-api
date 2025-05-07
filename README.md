@@ -13,12 +13,12 @@ Initial setup, basic routing, and video streaming functionality are being implem
 
 - [x] Project setup with Node.js/Express backend
 - [x] Serve movie files from local storage
-- [ ] User authentication & dashboard
-- [ ] Stream movies via HTML5 video player
-- [ ] Movie metadata (title, description, poster)
-- [ ] Search and filtering
-- [ ] Admin panel for uploads and management
-- [ ] Responsive frontend UI (React/Next.js)
+- [x] User authentication & dashboard
+- [x] Stream movies via HTML5 video player
+- [x] Movie metadata (title, description, poster)
+- [x] Search and filtering
+- [x] Admin panel for uploads and management
+- [x] Responsive frontend UI (React/Next.js)
 
 ---
 
