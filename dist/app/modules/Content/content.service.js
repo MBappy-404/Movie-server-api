@@ -99,52 +99,58 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
 });
 const deleteSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.content.findUniqueOrThrow({
-        where: {
-            id,
-        },
+        where: { id },
     });
     const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        // First delete all comments associated with reviews of this content
+        // First delete all likes associated with reviews of this content
+        yield tx.like.deleteMany({
+            where: {
+                review: {
+                    contentId: id,
+                },
+            },
+        });
+        // Then delete all comments associated with reviews of this content
         yield tx.comment.deleteMany({
             where: {
                 review: {
-                    contentId: id
-                }
-            }
+                    contentId: id,
+                },
+            },
         });
         // Then delete all reviews associated with this content
         yield tx.reviews.deleteMany({
             where: {
-                contentId: id
-            }
+                contentId: id,
+            },
         });
         // Delete all payments associated with this content
         yield tx.payment.deleteMany({
             where: {
-                contentId: id
-            }
+                contentId: id,
+            },
         });
         // Delete all user purchase contents associated with this content
         yield tx.userPurchaseContents.deleteMany({
             where: {
-                contentId: id
-            }
+                contentId: id,
+            },
         });
         // Delete all discounts associated with this content
         yield tx.discount.deleteMany({
             where: {
-                contentId: id
-            }
+                contentId: id,
+            },
         });
         // Then delete the content link
         const linkinfo = yield tx.contentLinks.delete({
             where: {
-                contentId: id
-            }
+                contentId: id,
+            },
         });
         // Finally delete the content
         yield tx.content.delete({
-            where: { id: linkinfo.contentId }
+            where: { id: linkinfo.contentId },
         });
     }));
     return result;

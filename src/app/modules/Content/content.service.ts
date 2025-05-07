@@ -109,63 +109,72 @@ const getSingleContentFromDB = async (id: string) => {
 
 const deleteSingleContentFromDB = async (id: string) => {
   await prisma.content.findUniqueOrThrow({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
-  const result = await prisma.$transaction(async(tx)=> {
-    // First delete all comments associated with reviews of this content
+  const result = await prisma.$transaction(async (tx) => {
+    // First delete all likes associated with reviews of this content
+    await tx.like.deleteMany({
+      where: {
+        review: {
+          contentId: id,
+        },
+      },
+    });
+
+    // Then delete all comments associated with reviews of this content
     await tx.comment.deleteMany({
       where: {
         review: {
-          contentId: id
-        }
-      }
+          contentId: id,
+        },
+      },
     });
 
     // Then delete all reviews associated with this content
     await tx.reviews.deleteMany({
       where: {
-        contentId: id
-      }
+        contentId: id,
+      },
     });
 
     // Delete all payments associated with this content
     await tx.payment.deleteMany({
       where: {
-        contentId: id
-      }
+        contentId: id,
+      },
     });
 
     // Delete all user purchase contents associated with this content
     await tx.userPurchaseContents.deleteMany({
       where: {
-        contentId: id
-      }
+        contentId: id,
+      },
     });
 
     // Delete all discounts associated with this content
     await tx.discount.deleteMany({
       where: {
-        contentId: id
-      }
+        contentId: id,
+      },
     });
 
     // Then delete the content link
     const linkinfo = await tx.contentLinks.delete({
       where: {
-        contentId: id
-      }
+        contentId: id,
+      },
     });
 
     // Finally delete the content
     await tx.content.delete({
-      where: {id: linkinfo.contentId}
+      where: { id: linkinfo.contentId },
     });
   });
+
   return result;
 };
+
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
