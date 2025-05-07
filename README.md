@@ -4,7 +4,7 @@ A public movie streaming server project – designed to store, organize, and str
 
 ## 🚧 Project Status
 
-**Currently In Progress**  
+**Complete Backend Server**  
 Initial setup, basic routing, and video streaming functionality are being implemented.
 
 ---
