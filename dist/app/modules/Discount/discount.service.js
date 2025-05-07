@@ -87,7 +87,7 @@ const getActiveDiscounts = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 const getSingleDiscoundById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.discount.findUnique({
-        where: { id }
+        where: { contentId: id }
     });
     return result;
 });

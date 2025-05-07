@@ -100,7 +100,7 @@ const getActiveDiscounts = async () => {
 
 const getSingleDiscoundById = async(id: string)=> {
   const result = await prisma.discount.findUnique({
-    where: {id}
+    where: {contentId: id}
   })
 
   return result
