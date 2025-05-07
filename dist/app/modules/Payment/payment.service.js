@@ -18,7 +18,7 @@ const ssl_service_1 = require("../SSL/ssl.service");
 const client_1 = require("@prisma/client");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
-const sendEmail_1 = __importDefault(require("./sendEmail"));
+const sendEmail_1 = __importDefault(require("../../utils/sendEmail"));
 const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield prisma_1.default.user.findUnique({
         where: {
@@ -80,7 +80,7 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         },
     });
     // Calculate the amount based on purchase status and apply discount if available
-    let amount = payload.status === client_1.purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+    let amount = contentData.price;
     const originalAmount = amount;
     if (activeDiscount) {
         const discountAmount = (amount * activeDiscount.percentage) / 100;

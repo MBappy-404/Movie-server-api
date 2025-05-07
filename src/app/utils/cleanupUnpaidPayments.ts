@@ -1,4 +1,4 @@
-import prisma from "../../helper/prisma";
+import prisma from "../helper/prisma";
 import { PaymentStatus } from "@prisma/client";
 
 const cleanupUnpaidPayments = async () => {

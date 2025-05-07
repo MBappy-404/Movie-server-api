@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discount_service_1 = require("../modules/Discount/discount.service");
-const cleanupUnpaidPayments_1 = __importDefault(require("../modules/Payment/cleanupUnpaidPayments"));
+const cleanupUnpaidPayments_1 = __importDefault(require("./cleanupUnpaidPayments"));
 // Run cleanup every hour
 const SCHEDULE_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
 const startScheduler = () => {

@@ -1,5 +1,5 @@
 import { DiscountService } from "../modules/Discount/discount.service";
-import cleanupUnpaidPayments from "../modules/Payment/cleanupUnpaidPayments";
+import cleanupUnpaidPayments from "./cleanupUnpaidPayments";
 
 
 // Run cleanup every hour

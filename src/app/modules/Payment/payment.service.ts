@@ -5,7 +5,7 @@ import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { IUserPurchaseContents } from "../UserPurchaseContents/userPurchaseContents.interface";
 import { IPayment, IPaymentCreate } from "./payment.interface";
-import emailSender from "./sendEmail";
+import emailSender from "../../utils/sendEmail";
 
 const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   const userData = await prisma.user.findUnique({
@@ -77,7 +77,7 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   });
 
   // Calculate the amount based on purchase status and apply discount if available
-  let amount = payload.status === purchaseStatus.RENTED ? contentData.rentprice : contentData.price;
+  let amount = contentData.price;
   const originalAmount = amount;
   
   if (activeDiscount) {
