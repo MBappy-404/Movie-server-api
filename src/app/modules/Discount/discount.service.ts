@@ -81,7 +81,13 @@ const getActiveDiscounts = async () => {
       },
     },
     include: {
-      content: true,
+      content:{
+        include:{
+          genre: true,
+          platform: true,
+          reviews: true
+        }
+      }
     },
     orderBy: {
       createdAt: "desc",

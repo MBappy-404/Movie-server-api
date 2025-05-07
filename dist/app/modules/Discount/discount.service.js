@@ -71,7 +71,13 @@ const getActiveDiscounts = () => __awaiter(void 0, void 0, void 0, function* () 
             },
         },
         include: {
-            content: true,
+            content: {
+                include: {
+                    genre: true,
+                    platform: true,
+                    reviews: true
+                }
+            }
         },
         orderBy: {
             createdAt: "desc",
@@ -79,9 +85,9 @@ const getActiveDiscounts = () => __awaiter(void 0, void 0, void 0, function* () 
     });
     return result;
 });
-const getSingleDiscoundByContentId = (contentId) => __awaiter(void 0, void 0, void 0, function* () {
+const getSingleDiscoundById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.discount.findUnique({
-        where: { contentId }
+        where: { id }
     });
     return result;
 });
@@ -152,7 +158,7 @@ exports.DiscountService = {
     createDiscount,
     getAllDiscounts,
     getActiveDiscounts,
-    getSingleDiscoundByContentId,
+    getSingleDiscoundById,
     updateDiscount,
     deleteDiscount,
     deactivateExpiredDiscounts

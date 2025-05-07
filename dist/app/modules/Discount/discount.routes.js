@@ -14,7 +14,7 @@ const router = express_1.default.Router();
 router.post("/", (0, auth_1.default)(client_1.UserRole.ADMIN), (0, validateRequest_1.default)(discount_validation_1.discountValidate.createDiscountSchema), discount_controller_1.DiscountController.createDiscount);
 router.get("/", (0, auth_1.default)(client_1.UserRole.ADMIN), discount_controller_1.DiscountController.getAllDiscounts);
 router.get("/active", discount_controller_1.DiscountController.getActiveDiscounts);
-router.get("/:contentId", discount_controller_1.DiscountController.getDiscountByContentId);
+router.get("/:id", discount_controller_1.DiscountController.getSingleDiscountById);
 router.patch("/:id", (0, auth_1.default)(client_1.UserRole.ADMIN), (0, validateRequest_1.default)(discount_validation_1.discountValidate.updateDiscountSchema), discount_controller_1.DiscountController.updateDiscount);
 router.delete("/:id", (0, auth_1.default)(client_1.UserRole.ADMIN), discount_controller_1.DiscountController.deleteDiscount);
 exports.DiscountRoutes = router;
