@@ -140,12 +140,9 @@ const deactivateExpiredDiscounts = () => __awaiter(void 0, void 0, void 0, funct
     });
     // Deactivate each expired discount
     for (const discount of expiredDiscounts) {
-        yield prisma_1.default.discount.update({
+        yield prisma_1.default.discount.delete({
             where: {
                 id: discount.id
-            },
-            data: {
-                isActive: false
             }
         });
     }

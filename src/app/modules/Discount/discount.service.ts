@@ -181,12 +181,9 @@ const deactivateExpiredDiscounts = async () => {
 
   // Deactivate each expired discount
   for (const discount of expiredDiscounts) {
-    await prisma.discount.update({
+    await prisma.discount.delete({
       where: {
         id: discount.id
-      },
-      data: {
-        isActive: false
       }
     });
   }
