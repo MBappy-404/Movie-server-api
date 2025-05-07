@@ -32,7 +32,8 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
     throw new AppError(httpStatus.NOT_FOUND, "Content not found!");
   }
 
-  const paymentData = await prisma.payment.findUnique({
+  // Check for existing payment (both paid and unpaid)
+  const existingPayment = await prisma.payment.findUnique({
     where: {
       userId_contentId: {
         userId: userData?.id,
@@ -45,8 +46,18 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
     },
   });
 
-  if (paymentData) {
+  // If payment exists and is PAID, throw error
+  if (existingPayment && existingPayment.status === PaymentStatus.PAID) {
     throw new AppError(httpStatus.BAD_REQUEST, "Payment already made!");
+  }
+
+  // If payment exists and is UNPAID, delete it before creating new one
+  if (existingPayment && existingPayment.status === PaymentStatus.UNPAID) {
+    await prisma.payment.delete({
+      where: {
+        id: existingPayment.id,
+      },
+    });
   }
 
   const trxId = `${userData?.id}-${contentData?.id}`;

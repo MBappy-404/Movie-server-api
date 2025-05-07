@@ -40,7 +40,8 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
     if (!contentData) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Content not found!");
     }
-    const paymentData = yield prisma_1.default.payment.findUnique({
+    // Check for existing payment (both paid and unpaid)
+    const existingPayment = yield prisma_1.default.payment.findUnique({
         where: {
             userId_contentId: {
                 userId: userData === null || userData === void 0 ? void 0 : userData.id,
@@ -52,8 +53,17 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
             content: true,
         },
     });
-    if (paymentData) {
+    // If payment exists and is PAID, throw error
+    if (existingPayment && existingPayment.status === client_1.PaymentStatus.PAID) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Payment already made!");
+    }
+    // If payment exists and is UNPAID, delete it before creating new one
+    if (existingPayment && existingPayment.status === client_1.PaymentStatus.UNPAID) {
+        yield prisma_1.default.payment.delete({
+            where: {
+                id: existingPayment.id,
+            },
+        });
     }
     const trxId = `${userData === null || userData === void 0 ? void 0 : userData.id}-${contentData === null || contentData === void 0 ? void 0 : contentData.id}`;
     // Check for active discount
