@@ -3,7 +3,7 @@ import cleanupUnpaidPayments from "./cleanupUnpaidPayments";
 
 
 // Run cleanup every hour
-const SCHEDULE_INTERVAL = 10 * 1000; // 10 minute in milliseconds
+const SCHEDULE_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const startScheduler = () => {
   console.log("Starting schedulers...");
