@@ -10,6 +10,7 @@ const createUserValidation = zod_1.default.object({
     name: zod_1.default.string({ required_error: "Name is reqired" }),
     email: zod_1.default.string({ required_error: "Email is reqired" }),
     password: zod_1.default.string({ required_error: "Password is reqired" }),
+    role: zod_1.default.string().optional(),
     contactNumber: zod_1.default.string({ required_error: "Contact Number is reqired" })
 });
 const updateUserValidation = zod_1.default.object({

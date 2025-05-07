@@ -6,6 +6,7 @@ const createUserValidation = z.object({
     name: z.string({ required_error: "Name is reqired" }),
     email: z.string({ required_error: "Email is reqired" }),
     password: z.string({ required_error: "Password is reqired" }),
+    role: z.string().optional(),
     contactNumber: z.string({ required_error: "Contact Number is reqired" })
 })
 
