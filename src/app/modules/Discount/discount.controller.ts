@@ -37,9 +37,9 @@ const getActiveDiscounts = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getDiscountByContentId = catchAsync(async (req: Request, res: Response) => {
-  const {contentId} = req.params
-  const result = await DiscountService.getSingleDiscoundByContentId(contentId);
+const getSingleDiscountById = catchAsync(async (req: Request, res: Response) => {
+  const {id} = req.params
+  const result = await DiscountService.getSingleDiscoundById(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -75,5 +75,5 @@ export const DiscountController = {
   getActiveDiscounts,
   updateDiscount,
   deleteDiscount,
-  getDiscountByContentId
+  getSingleDiscountById
 }; 

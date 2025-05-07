@@ -18,7 +18,7 @@ router.post(
 router.get("/", auth(UserRole.ADMIN), DiscountController.getAllDiscounts);
 
 router.get("/active", DiscountController.getActiveDiscounts);
-router.get("/:contentId", DiscountController.getDiscountByContentId);
+router.get("/:id", DiscountController.getSingleDiscountById);
 
 router.patch(
   "/:id",

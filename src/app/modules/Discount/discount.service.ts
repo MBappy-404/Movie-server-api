@@ -92,9 +92,9 @@ const getActiveDiscounts = async () => {
 };
 
 
-const getSingleDiscoundByContentId = async(contentId: any)=> {
+const getSingleDiscoundById = async(id: string)=> {
   const result = await prisma.discount.findUnique({
-    where: {contentId}
+    where: {id}
   })
 
   return result
@@ -195,7 +195,7 @@ export const DiscountService = {
   createDiscount,
   getAllDiscounts,
   getActiveDiscounts,
-  getSingleDiscoundByContentId,
+  getSingleDiscoundById,
   updateDiscount,
   deleteDiscount,
   deactivateExpiredDiscounts
