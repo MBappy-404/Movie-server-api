@@ -8,7 +8,7 @@ const CreateContentValidationSchema = z.object({
     price: z.number({ required_error: "Price is required" }),
     rentprice: z.number({ required_error: "Rent Price is required" }),
     director: z.string({ required_error: "Director is required" }),
-    
+    spoilerWarning:  z.string({ required_error: "Spoiler Warning is required" }),
     contentBanner: z.string({ required_error: "Content Banner is required" }),
     producer: z.string({ required_error: "Producer is required" }),
     actor: z.string({ required_error: "Actor is required" }),
