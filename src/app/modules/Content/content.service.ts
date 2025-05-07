@@ -62,6 +62,7 @@ const getSingleContentFromDB = async (id: string) => {
           },
         },
       },
+      discount: true
     },
   });
 

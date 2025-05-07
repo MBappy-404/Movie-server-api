@@ -70,6 +70,7 @@ const getSingleContentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
                     },
                 },
             },
+            discount: true
         },
     });
     if (!result) {
