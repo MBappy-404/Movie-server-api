@@ -8,6 +8,13 @@ const createDiscountSchema = zod_1.z.object({
         percentage: zod_1.z.number().min(1).max(100),
         startDate: zod_1.z.string(),
         endDate: zod_1.z.string(),
+    }).refine(data => {
+        if (data.percentage && data.percentage > 100) {
+            return false;
+        }
+        return true;
+    }, {
+        message: "Percentage discount cannot exceed 100%"
     }),
 });
 const updateDiscountSchema = zod_1.z.object({
@@ -16,6 +23,13 @@ const updateDiscountSchema = zod_1.z.object({
         startDate: zod_1.z.string().optional(),
         endDate: zod_1.z.string().optional(),
         isActive: zod_1.z.boolean().optional(),
+    }).refine(data => {
+        if (data.percentage && data.percentage > 100) {
+            return false;
+        }
+        return true;
+    }, {
+        message: "Percentage discount cannot exceed 100%"
     }),
 });
 exports.discountValidate = {

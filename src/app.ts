@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser'
 import  HttpStatus  from "http-status";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
-import { AuthRoutes } from "./app/modules/Auth/auth.route";
 
 // middlewares 
 const app = express();

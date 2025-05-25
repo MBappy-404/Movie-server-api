@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discount_service_1 = require("../modules/Discount/discount.service");
 const cleanupUnpaidPayments_1 = __importDefault(require("./cleanupUnpaidPayments"));
 // Run cleanup every hour
-const SCHEDULE_INTERVAL = 60 * 60 * 1000; // 1 hour in milliseconds
+const SCHEDULE_INTERVAL = 60 * 60 * 2000; // 2 hour in milliseconds
 const startScheduler = () => {
     console.log("Starting schedulers...");
     // Run payment cleanup immediately on startup

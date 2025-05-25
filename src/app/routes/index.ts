@@ -15,6 +15,9 @@ import { UserPurchaseContentsRoutes } from "../modules/UserPurchaseContents/user
 import { PaymentRoutes } from "../modules/Payment/payment.routes";
 import { ContentLinksRoutes } from "../modules/ContentLinks/contentLinks.routes";
 import { DiscountRoutes } from "../modules/Discount/discount.routes";
+import { NewsletterRoutes } from "../modules/newsletter/newsletter.routes";
+import { ContactUsRoutes } from "../modules/contactUs/contactUs.routes";
+import { CouponRoutes } from "../modules/coupon/coupon.routes";
 
 const router = Router();
 
@@ -70,6 +73,18 @@ const moduleRoutes = [
   {
     path: "/discount",
     routes: DiscountRoutes,
+  },
+  {
+    path: "/newsletter",
+    routes: NewsletterRoutes,
+  },
+  {
+    path: "/contact-us",
+    routes: ContactUsRoutes,
+  },
+  {
+    path: "/coupon",
+    routes: CouponRoutes,
   },
 ];
 

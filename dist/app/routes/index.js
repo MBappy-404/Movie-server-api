@@ -14,6 +14,9 @@ const userPurchaseContents_routes_1 = require("../modules/UserPurchaseContents/u
 const payment_routes_1 = require("../modules/Payment/payment.routes");
 const contentLinks_routes_1 = require("../modules/ContentLinks/contentLinks.routes");
 const discount_routes_1 = require("../modules/Discount/discount.routes");
+const newsletter_routes_1 = require("../modules/newsletter/newsletter.routes");
+const contactUs_routes_1 = require("../modules/contactUs/contactUs.routes");
+const coupon_routes_1 = require("../modules/coupon/coupon.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -67,6 +70,18 @@ const moduleRoutes = [
     {
         path: "/discount",
         routes: discount_routes_1.DiscountRoutes,
+    },
+    {
+        path: "/newsletter",
+        routes: newsletter_routes_1.NewsletterRoutes,
+    },
+    {
+        path: "/contact-us",
+        routes: contactUs_routes_1.ContactUsRoutes,
+    },
+    {
+        path: "/coupon",
+        routes: coupon_routes_1.CouponRoutes,
     },
 ];
 moduleRoutes.forEach(({ path, routes }) => {

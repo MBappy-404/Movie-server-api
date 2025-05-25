@@ -6,6 +6,7 @@ import httpStatus from "http-status";
 import { IUserPurchaseContents } from "../UserPurchaseContents/userPurchaseContents.interface";
 import { IPayment, IPaymentCreate } from "./payment.interface";
 import emailSender from "../../utils/sendEmail";
+import { CouponServices } from "../coupon/coupon.service";
 
 const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   const userData = await prisma.user.findUnique({
@@ -79,13 +80,44 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
   // Calculate the amount based on purchase status and apply discount if available
   let amount = contentData.price;
   const originalAmount = amount;
-  
+  let totalDiscount = 0;
+  let couponId = null;
+
+  // Apply content discount first
   if (activeDiscount) {
     const discountAmount = (amount * activeDiscount.percentage) / 100;
+    totalDiscount += discountAmount;
     amount = amount - discountAmount;
   }
 
-  const paymentCreateData: IPaymentCreate = {
+  // Apply coupon discount
+  if (payload.couponCode) {
+    const couponResult = await CouponServices.validateCoupon({
+      code: payload.couponCode,
+      amount: amount
+    });
+    totalDiscount += (amount - couponResult.discountedAmount);
+    amount = couponResult.discountedAmount;
+    couponId = couponResult.coupon.id;
+  }
+  
+  // Update coupon usage count if coupon was applied
+  if (couponId) {
+    await prisma.coupon.update({
+      where: { id: couponId },
+      data: {
+        usedCount: {
+          increment: 1
+        },
+        usageLimit: {
+          decrement: 1
+        }
+      }
+    });
+  }
+
+
+  const paymentCreateData: any = {
     userId: userData.id,
     contentId: contentData.id,
     amount: amount,
@@ -94,32 +126,68 @@ const initPayment = async (payload: IUserPurchaseContents, user: any) => {
     purchaseStatus: payload.status,
     originalAmount: originalAmount,
     discountPercentage: activeDiscount?.percentage || 0,
+    couponId: couponId,
+    totalDiscount: totalDiscount
   };
 
-  const newPayment = await prisma.payment.create({
-    data: paymentCreateData,
+  // Use transaction for payment creation and coupon update
+  const result = await prisma.$transaction(async (tx) => {
+    // Create payment
+    const newPayment = await tx.payment.create({
+      data: paymentCreateData,
+    });
+
+    // Update coupon usage if coupon was applied
+    if (couponId) {
+      const coupon = await tx.coupon.findUnique({
+        where: { id: couponId }
+      });
+      console.log(coupon, "coupon");
+
+      if (!coupon) {
+        throw new AppError(httpStatus.NOT_FOUND, "Coupon not found");
+      }
+
+      if (coupon.usedCount >= coupon.usageLimit) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Coupon usage limit exceeded");
+      }
+
+      await tx.coupon.update({
+        where: { id: couponId },
+        data: {
+          usedCount: coupon.usedCount + 1,
+          usageLimit: coupon.usageLimit - 1
+        }
+      });
+    }
+
+    return newPayment;
   });
 
   const initPaymentData = {
-    amount: newPayment.amount,
-    transactionId: newPayment.transactionId,
+    amount: result.amount,
+    transactionId: result.transactionId,
     name: userData.name,
     email: userData.email,
     userId: userData.id,
     contentId: contentData.id,
     purchaseStatus: payload.status,
     originalAmount: originalAmount,
+    couponId: couponId,
     discountPercentage: activeDiscount?.percentage || 0,
+    totalDiscount: totalDiscount
   };
 
-  const result = await SSLService.initPayment(initPaymentData);
+  const paymentUrl = await SSLService.initPayment(initPaymentData);
   return {
-    paymentUrl: result,
+    paymentUrl: paymentUrl,
     paymentDetails: {
-      amount: newPayment.amount,
+      amount: result.amount,
       originalAmount: originalAmount,
       discountPercentage: activeDiscount?.percentage || 0,
       discountApplied: !!activeDiscount,
+      couponApplied: !!couponId,
+      totalDiscount: totalDiscount
     },
   };
 };
@@ -146,7 +214,7 @@ const removeUnpaidPayment = async (paymentId: string) => {
     },
   });
 
-  return {  };
+  return {};
 };
 
 const validatePayment = async (payload: { tran_id?: string }) => {

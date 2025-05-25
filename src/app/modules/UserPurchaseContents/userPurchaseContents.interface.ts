@@ -1,5 +1,7 @@
-export interface IUserPurchaseContents {
-  userId: string;
+import { purchaseStatus } from "@prisma/client";
+
+export type IUserPurchaseContents = {
   contentId: string;
-  status: "RENTED" | "BOUGHT";
-}
+  status: purchaseStatus;
+  couponCode?: string;
+};

@@ -19,6 +19,7 @@ const client_1 = require("@prisma/client");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
 const sendEmail_1 = __importDefault(require("../../utils/sendEmail"));
+const coupon_service_1 = require("../coupon/coupon.service");
 const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
     const userData = yield prisma_1.default.user.findUnique({
         where: {
@@ -82,9 +83,37 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
     // Calculate the amount based on purchase status and apply discount if available
     let amount = contentData.price;
     const originalAmount = amount;
+    let totalDiscount = 0;
+    let couponId = null;
+    // Apply content discount first
     if (activeDiscount) {
         const discountAmount = (amount * activeDiscount.percentage) / 100;
+        totalDiscount += discountAmount;
         amount = amount - discountAmount;
+    }
+    // Apply coupon discount
+    if (payload.couponCode) {
+        const couponResult = yield coupon_service_1.CouponServices.validateCoupon({
+            code: payload.couponCode,
+            amount: amount
+        });
+        totalDiscount += (amount - couponResult.discountedAmount);
+        amount = couponResult.discountedAmount;
+        couponId = couponResult.coupon.id;
+    }
+    // Update coupon usage count if coupon was applied
+    if (couponId) {
+        yield prisma_1.default.coupon.update({
+            where: { id: couponId },
+            data: {
+                usedCount: {
+                    increment: 1
+                },
+                usageLimit: {
+                    decrement: 1
+                }
+            }
+        });
     }
     const paymentCreateData = {
         userId: userData.id,
@@ -95,29 +124,60 @@ const initPayment = (payload, user) => __awaiter(void 0, void 0, void 0, functio
         purchaseStatus: payload.status,
         originalAmount: originalAmount,
         discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
+        couponId: couponId,
+        totalDiscount: totalDiscount
     };
-    const newPayment = yield prisma_1.default.payment.create({
-        data: paymentCreateData,
-    });
+    // Use transaction for payment creation and coupon update
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // Create payment
+        const newPayment = yield tx.payment.create({
+            data: paymentCreateData,
+        });
+        // Update coupon usage if coupon was applied
+        if (couponId) {
+            const coupon = yield tx.coupon.findUnique({
+                where: { id: couponId }
+            });
+            console.log(coupon, "coupon");
+            if (!coupon) {
+                throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Coupon not found");
+            }
+            if (coupon.usedCount >= coupon.usageLimit) {
+                throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Coupon usage limit exceeded");
+            }
+            yield tx.coupon.update({
+                where: { id: couponId },
+                data: {
+                    usedCount: coupon.usedCount + 1,
+                    usageLimit: coupon.usageLimit - 1
+                }
+            });
+        }
+        return newPayment;
+    }));
     const initPaymentData = {
-        amount: newPayment.amount,
-        transactionId: newPayment.transactionId,
+        amount: result.amount,
+        transactionId: result.transactionId,
         name: userData.name,
         email: userData.email,
         userId: userData.id,
         contentId: contentData.id,
         purchaseStatus: payload.status,
         originalAmount: originalAmount,
+        couponId: couponId,
         discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
+        totalDiscount: totalDiscount
     };
-    const result = yield ssl_service_1.SSLService.initPayment(initPaymentData);
+    const paymentUrl = yield ssl_service_1.SSLService.initPayment(initPaymentData);
     return {
-        paymentUrl: result,
+        paymentUrl: paymentUrl,
         paymentDetails: {
-            amount: newPayment.amount,
+            amount: result.amount,
             originalAmount: originalAmount,
             discountPercentage: (activeDiscount === null || activeDiscount === void 0 ? void 0 : activeDiscount.percentage) || 0,
             discountApplied: !!activeDiscount,
+            couponApplied: !!couponId,
+            totalDiscount: totalDiscount
         },
     };
 });
