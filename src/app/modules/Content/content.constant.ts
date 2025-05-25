@@ -7,5 +7,6 @@ export const contentFilterableFields: string[]= [
     'actor',
     'searchTerm',
     'genre',
-    'platform'
+    'platform',
+    'isAvailable'
 ]

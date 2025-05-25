@@ -200,11 +200,22 @@ const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, func
     }
     if (Object.keys(filterData).length > 0) {
         andCondition.push({
-            AND: Object.keys(filterData).map((key) => ({
-                [key]: {
-                    equals: filterData[key],
-                },
-            })),
+            AND: Object.keys(filterData).map((key) => {
+                const value = filterData[key];
+                // Convert string "true"/"false" to boolean for boolean fields
+                if (key === 'isAvailable' && typeof value === 'string') {
+                    return {
+                        [key]: {
+                            equals: value.toLowerCase() === 'true'
+                        }
+                    };
+                }
+                return {
+                    [key]: {
+                        equals: value
+                    }
+                };
+            }),
         });
     }
     const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};

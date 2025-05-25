@@ -225,11 +225,22 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
-      AND: Object.keys(filterData).map((key) => ({
-        [key]: {
-          equals: (filterData as any)[key],
-        },
-      })),
+      AND: Object.keys(filterData).map((key) => {
+        const value = (filterData as any)[key];
+        // Convert string "true"/"false" to boolean for boolean fields
+        if (key === 'isAvailable' && typeof value === 'string') {
+          return {
+            [key]: {
+              equals: value.toLowerCase() === 'true'
+            }
+          };
+        }
+        return {
+          [key]: {
+            equals: value
+          }
+        };
+      }),
     });
   }
 

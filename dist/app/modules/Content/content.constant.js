@@ -9,5 +9,6 @@ exports.contentFilterableFields = [
     'actor',
     'searchTerm',
     'genre',
-    'platform'
+    'platform',
+    'isAvailable'
 ];
